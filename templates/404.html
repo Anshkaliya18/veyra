@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page not found · Veyra</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/motion.css') }}" />
+</head>
+<body>
+
+  <!-- Background grid noise -->
+  <div class="grid-noise"></div>
+
+  <div class="shell">
+
+    <!-- ── Nav ── -->
+    <nav class="nav">
+      <a class="brand" href="/">
+        <i class="brand-mark"></i>
+        <span class="brand-name">ve<span>y</span>ra</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="/#product">Product</a>
+        <a href="/#how-it-works">How it works</a>
+        <a href="/#stories">Stories</a>
+        <a href="/#faq">FAQ</a>
+      </div>
+
+      <div class="nav-actions">
+
+          {% if session.get('user_id') %}
+
+              <a href="{{ url_for('dashboard') }}"
+                class="btn btn-secondary btn-small">
+
+                  Dashboard
+
+              </a>
+
+              <a href="{{ url_for('profile') }}"
+                class="btn btn-primary btn-small profile-btn">
+
+                  {{ session.get('firstName')[0] }}{{ session.get('lastName')[0] }}
+
+              </a>
+
+          {% else %}
+
+              <a href="{{ url_for('login') }}"
+                class="btn btn-secondary btn-small">
+
+                  Log in
+
+              </a>
+
+              <a href="{{ url_for('signup') }}"
+                class="btn btn-primary btn-small"
+                data-magnetic>
+
+                  Get started <span>→</span>
+
+              </a>
+
+          {% endif %}
+
+      </div>      
+
+      <button class="mobile-menu" id="mobileMenuBtn" aria-label="Open menu">☰</button>
+    </nav>
+
+    <!-- ── 404 Hero ── -->
+    <main class="page-404">
+
+      <!-- Orbital rings -->
+      <div class="orbital-404"></div>
+      <div class="orbital-404-inner"></div>
+
+      <!-- Floating chips -->
+      <span class="chip-404 chip-404-a">✦ Route not found</span>
+      <span class="chip-404 chip-404-b">⌁ Identity intact</span>
+      <span class="chip-404 chip-404-c">◌ Keep exploring</span>
+
+      <!-- Giant number -->
+      <div class="error-number">404</div>
+
+      <!-- Glass card -->
+      <div class="error-card glass">
+
+        <!-- Eyebrow badge -->
+        <div style="display:flex; justify-content:center; margin-bottom:20px;">
+          <span class="badge">
+            <i class="dot"></i>
+            Lost in the constellation
+          </span>
+        </div>
+
+        <h1>
+          This page doesn&rsquo;t
+          <span class="gradient-text">exist yet.</span>
+        </h1>
+
+        <p>
+          The document you&rsquo;re looking for hasn&rsquo;t been indexed &mdash;
+          or it may have moved. Your identity map is still intact, though.
+          Let&rsquo;s get you back on track.
+        </p>
+
+        <!-- Search bar -->
+        <form id="searchForm" onsubmit="handleSearch(event)">
+          <div class="lost-search">
+            <span class="search-icon">◌</span>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search your documents, skills, milestones…"
+              autocomplete="off"
+            />
+          </div>
+        </form>
+
+        <!-- CTA buttons -->
+        <div class="error-actions">
+          <a class="btn btn-primary" href="/">← Back to home</a>
+          <a class="btn btn-secondary" href="/#product">Explore Veyra <span>↘</span></a>
+        </div>
+
+      </div><!-- /error-card -->
+
+      <!-- Quick navigation links -->
+      <div class="quick-links">
+        <a class="quick-link" href="/#product">
+          <span class="quick-link-icon">✦</span>Product
+        </a>
+        <a class="quick-link" href="/#how-it-works">
+          <span class="quick-link-icon">⌁</span>How it works
+        </a>
+        <a class="quick-link" href="/#stories">
+          <span class="quick-link-icon">◌</span>Stories
+        </a>
+        <a class="quick-link" href="/#faq">
+          <span class="quick-link-icon">?</span>FAQ
+        </a>
+        <a class="quick-link" href="/signup">
+          <span class="quick-link-icon">→</span>Sign up
+        </a>
+      </div>
+
+      <!-- Decorative mini timeline -->
+      <div class="deco-timeline">
+        <div class="deco-item">
+          <b>You were here</b>
+          Browsing your connected identity
+        </div>
+        <div class="deco-item">
+          <b>Something went wrong</b>
+          This route doesn&rsquo;t exist
+        </div>
+        <div class="deco-item">
+          <b>Next step</b>
+          Head home and continue your journey
+        </div>
+      </div>
+
+    </main><!-- /page-404 -->
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <a class="brand" href="/">
+        <i class="brand-mark"></i>
+        <span class="brand-name">ve<span>y</span>ra</span>
+      </a>
+      <span>&copy; 2026 Veyra. Your story, beautifully connected.</span>
+      <div class="footer-links">
+        <a href="/login">Log in</a>
+        <a href="/signup">Create identity</a>
+      </div>
+    </footer>
+
+  </div><!-- /shell -->
+
+  <script src="{{ url_for('static', filename='js/404.js') }}"></script>
+
+</body>
+</html>

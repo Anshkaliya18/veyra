@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Settings — Veyra</title>
+    <link rel="stylesheet" href="css/settings.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>Settings</b></span>
+          <div class="top-tools">
+            <a class="btn btn-secondary btn-small" href="/profile"
+              >View profile</a
+            >
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">Make Veyra yours</p>
+            <h1>Settings & privacy.</h1>
+            <p>Fine-tune how your identity works, learns, and appears.</p>
+          </div>
+        </section>
+        <section class="settings-layout">
+          <aside class="app-card settings-nav">
+            <a class="side-link active" href="#general" data-panel="general"
+              >◉ General</a
+            ><a class="side-link" href="#intelligence" data-panel="intelligence"
+              >✦ Intelligence</a
+            ><a class="side-link" href="#privacy" data-panel="privacy"
+              >⌾ Privacy</a
+            ><a
+              class="side-link"
+              href="#notifications"
+              data-panel="notifications"
+              >♧ Notifications</a
+            >
+          </aside>
+          <div class="app-card setting-panel reveal" id="general">
+            <div class="setting-heading">
+              <h2>General</h2>
+              <p>Personalise the essentials of your workspace.</p>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Display name</b>
+                <p>The name shown on your profile and shared identity.</p>
+              </div>
+              <input class="settings-input" value="{{ user[1] }} {{ user[2] }}" />
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Identity headline</b>
+                <p>A short line that helps your story come into focus.</p>
+              </div>
+              <input
+                class="settings-input"
+                value="AI Builder · ML Enthusiast"
+              />
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Weekly identity digest</b>
+                <p>A thoughtful recap of new connections and progress.</p>
+              </div>
+              <button
+                class="switch on"
+                aria-label="Toggle weekly digest"
+              ></button>
+            </div>
+          </div>
+          <div class="app-card setting-panel" id="intelligence" hidden>
+            <div class="setting-heading">
+              <h2>Intelligence</h2>
+              <p>Choose how Veyra makes sense of your workspace.</p>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Discover skills automatically</b>
+                <p>Surface capabilities from every new document.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Build relationship suggestions</b>
+                <p>Connect related projects, credentials, and experiences.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Timeline moments</b>
+                <p>Suggest milestones based on document dates and content.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+          </div>
+          <div class="app-card setting-panel" id="privacy" hidden>
+            <div class="setting-heading">
+              <h2>Privacy & sharing</h2>
+              <p>You always decide what becomes visible.</p>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Private by default</b>
+                <p>New documents and insights are visible only to you.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Shareable profile</b>
+                <p>Allow a curated public profile link when you are ready.</p>
+              </div>
+              <button class="switch"></button>
+            </div>
+            <div class="setting-row danger">
+              <div>
+                <b>Delete identity workspace</b>
+                <p>
+                  Permanently remove all documents, relationships, and insights.
+                </p>
+              </div>
+              <button class="btn btn-small" id="delete-workspace">
+                Delete workspace
+              </button>
+            </div>
+          </div>
+          <div class="app-card setting-panel" id="notifications" hidden>
+            <div class="setting-heading">
+              <h2>Notifications</h2>
+              <p>Stay present without being interrupted.</p>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Document understanding complete</b>
+                <p>Let me know when Veyra finishes learning from a new file.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>New relationship discovered</b>
+                <p>Get a small signal when meaningful connections emerge.</p>
+              </div>
+              <button class="switch on"></button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <b>Weekly recap</b>
+                <p>A simple summary of your evolving professional story.</p>
+              </div>
+              <button class="switch"></button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/settings.js"></script>
+  </body>
+</html>

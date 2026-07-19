@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Upload — Veyra</title>
+    <link rel="stylesheet" href="css/upload.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link active" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }}{{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>Upload documents</b></span>
+          <div class="top-tools">
+            <a class="side-link" href="/settings"
+              ><span class="side-icon">⚙</span>Settings</a
+            ><button class="round-icon">♧</button>
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">Expand your story</p>
+            <h1>Add something meaningful.</h1>
+            <p>
+              Every document you add becomes part of an identity that keeps
+              getting sharper.
+            </p>
+          </div>
+          <span class="badge">Supported: PDF, DOCX, PNG, JPG, TXT</span>
+        </section>
+        <section class="upload-layout">
+          <div class="dropzone reveal" id="dropzone">
+            <div>
+              <div class="upload-glyph">↑</div>
+              <h2>Drop your documents here</h2>
+              <p>or choose files from your device — up to 25 MB per file</p>
+              <label class="btn btn-primary btn-small" for="file-input"
+                >Choose files <span>+</span></label
+              ><input
+                id="file-input"
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt"
+              />
+            </div>
+          </div>
+          <aside class="upload-info">
+            <article class="app-card reveal">
+              <p class="kicker">What Veyra does</p>
+              <p
+                style="
+                  font-size: 12px;
+                  line-height: 1.75;
+                  color: var(--muted);
+                  margin: 13px 0 0;
+                "
+              >
+                It reads the context inside every file, recognizes the
+                meaningful pieces, and links them to your evolving identity.
+              </p>
+            </article>
+            <article class="app-card reveal">
+              <p class="kicker">This month</p>
+              <div class="info-num">07</div>
+              <div class="info-label">documents added</div>
+              <div class="progress-line" style="margin-top: 13px">
+                <i style="--p: 68%"></i>
+              </div>
+              <p class="info-label">3 away from your monthly goal</p>
+            </article>
+            <article class="app-card reveal">
+              <p class="kicker">Always private</p>
+              <p
+                style="
+                  font-size: 11px;
+                  line-height: 1.65;
+                  color: var(--muted);
+                  margin: 10px 0 0;
+                "
+              >
+                Your documents stay in your workspace. Veyra only uses them to
+                understand your journey.
+              </p>
+            </article>
+          </aside>
+        </section>
+        <section class="app-section">
+          <div class="card-row">
+            <div>
+              <h2 class="card-title">In your workspace</h2>
+              <p class="card-sub">Your latest documents and their AI status</p>
+            </div>
+            <button class="btn btn-secondary btn-small" id="clear-files">
+              Clear completed
+            </button>
+          </div>
+          <article class="app-card file-table" style="margin-top: 15px">
+            <div class="table-head">
+              <span>Document</span><span>Category</span
+              ><span>Understanding</span><span>Status</span>
+            </div>
+            <div id="file-list">
+              <div class="file-row">
+                <div class="file-main">
+                  <span class="file-icon">PDF</span>
+                  <div>
+                    <b>ML Internship Letter.pdf</b><span>2.4 MB · Today</span>
+                  </div>
+                </div>
+                <span class="badge">Internship</span>
+                <div class="progress-line"><i style="--p: 100%"></i></div>
+                <span class="status">✓ Ready</span>
+              </div>
+              <div class="file-row">
+                <div class="file-main">
+                  <span
+                    class="file-icon"
+                    style="color: #a5f2e7; background: rgba(88, 224, 208, 0.13)"
+                    >DOC</span
+                  >
+                  <div>
+                    <b>Product Case Study.docx</b
+                    ><span>1.8 MB · Yesterday</span>
+                  </div>
+                </div>
+                <span class="badge">Project</span>
+                <div class="progress-line"><i style="--p: 100%"></i></div>
+                <span class="status">✓ Ready</span>
+              </div>
+              <div class="file-row">
+                <div class="file-main">
+                  <span
+                    class="file-icon"
+                    style="
+                      color: #ffe094;
+                      background: rgba(255, 202, 122, 0.13);
+                    "
+                    >IMG</span
+                  >
+                  <div>
+                    <b>Google Cloud Certificate.png</b
+                    ><span>1.1 MB · 15 Jul</span>
+                  </div>
+                </div>
+                <span class="badge">Certificate</span>
+                <div class="progress-line"><i style="--p: 100%"></i></div>
+                <span class="status">✓ Ready</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/upload.js"></script>
+  </body>
+</html>

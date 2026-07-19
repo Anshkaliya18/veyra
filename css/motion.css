@@ -1,0 +1,307 @@
+/* Bespoke identity-art motion treatment */
+.hero {
+  isolation: isolate;
+}
+
+.hero > :not(.hero-identity-art) {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-identity-art {
+  position: absolute;
+  z-index: 0;
+  top: -140px;
+  right: -38vw;
+  width: min(980px, 78vw);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  opacity: 0.68;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    black 30%,
+    transparent 70%
+  );
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+.hero-identity-art::before,
+.hero-identity-art::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: -25%;
+  pointer-events: none;
+}
+
+.hero-identity-art::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 24%,
+    rgba(113, 97, 255, 0.15) 31%,
+    transparent 42% 66%,
+    rgba(73, 222, 205, 0.13) 76%,
+    transparent 88%
+  );
+  animation: identity-sheen 13s linear infinite;
+}
+
+.hero-identity-art::after {
+  inset: 13%;
+  border: 1px solid rgba(121, 222, 212, 0.16);
+  border-radius: 50%;
+  box-shadow:
+    0 0 55px rgba(111, 93, 255, 0.21),
+    inset 0 0 35px rgba(82, 225, 211, 0.07);
+  animation: identity-ring 9s ease-in-out infinite;
+}
+
+.hero-identity-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  filter: saturate(1.1) contrast(1.06);
+  animation: identity-drift 17s ease-in-out infinite alternate;
+}
+
+.auth-art {
+  isolation: isolate;
+}
+
+.auth-art::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 18, 42, 0.94) 0%,
+      rgba(17, 18, 42, 0.65) 48%,
+      rgba(17, 18, 42, 0.08) 100%
+    ),
+    url("../assets/images/identity-constellation.png") right center / cover
+      no-repeat;
+  opacity: 0.88;
+  animation: auth-image-pan 20s ease-in-out infinite alternate;
+}
+
+.auth-art::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    circle at 72% 54%,
+    rgba(86, 226, 211, 0.18),
+    transparent 27%
+  );
+  animation: auth-glow 6s ease-in-out infinite;
+}
+
+@keyframes identity-drift {
+  0% {
+    transform: scale(1.02) translate3d(-1.2%, 1%, 0) rotate(-1deg);
+  }
+  100% {
+    transform: scale(1.11) translate3d(2.5%, -2%, 0) rotate(1.4deg);
+  }
+}
+
+@keyframes identity-sheen {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes identity-ring {
+  50% {
+    transform: scale(1.08) rotate(12deg);
+    opacity: 0.52;
+  }
+}
+
+@keyframes auth-image-pan {
+  0% {
+    background-position:
+      center,
+      69% 50%;
+    transform: scale(1.02);
+  }
+  100% {
+    background-position:
+      center,
+      82% 45%;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes auth-glow {
+  50% {
+    opacity: 0.42;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-identity-art img,
+  .hero-identity-art::before,
+  .hero-identity-art::after,
+  .auth-art::before,
+  .auth-art::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-identity-art {
+    top: -80px;
+    right: -34vw;
+    width: 850px;
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-identity-art {
+    top: -15px;
+    right: -120vw;
+    width: 720px;
+    opacity: 0.34;
+  }
+}
+
+/* ============================================================
+   motion.css — keyframes, transitions, and animated elements
+   (Veyra design system — pairs with shared.css)
+   ============================================================ */
+
+html { scroll-behavior: smooth; }
+
+/* Drifting background blobs */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  z-index: -2;
+  width: 48vw;
+  height: 48vw;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.17;
+  pointer-events: none;
+  animation: drift 16s ease-in-out infinite;
+}
+body::before { background: #6d4aff; top: -22vw; left: -13vw; }
+body::after  { background: #00cbb9; right: -16vw; bottom: -24vw; animation-delay: -8s; }
+
+/* Interactive transitions */
+.nav-links a { transition: color 0.2s ease; }
+.nav-links a:hover { color: white; }
+
+.btn { transition: 0.25s ease; }
+.btn:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(95, 80, 255, 0.24); }
+
+.quick-link { transition: 0.2s; }
+.quick-link:hover { border-color: #8779ff; color: #e5e2ff; background: rgba(135, 121, 255, 0.08); }
+
+/* Orbital rings behind the 404 number */
+.orbital-404 {
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  border: 1px solid rgba(131, 116, 255, 0.18);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin404 28s linear infinite;
+  z-index: -1;
+}
+.orbital-404::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 20px var(--cyan);
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.orbital-404-inner {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1px solid rgba(88, 224, 208, 0.14);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin404 18s linear infinite reverse;
+  z-index: -1;
+}
+.orbital-404-inner::before {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 14px var(--violet);
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Floating chips around the 404 number */
+.chip-404 {
+  position: absolute;
+  padding: 9px 13px;
+  border-radius: 12px;
+  font: 500 10px "DM Mono", monospace;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  animation: float404 5s ease-in-out infinite;
+  pointer-events: none;
+}
+.chip-404-a {
+  left: max(0px, calc(50% - 340px));
+  top: 28%;
+  background: rgba(28, 26, 65, 0.9);
+  border: 1px solid rgba(151, 132, 255, 0.38);
+  animation-delay: 0s;
+}
+.chip-404-b {
+  right: max(0px, calc(50% - 340px));
+  top: 35%;
+  background: rgba(12, 57, 60, 0.9);
+  border: 1px solid rgba(88, 224, 208, 0.36);
+  animation-delay: -2s;
+}
+.chip-404-c {
+  left: max(0px, calc(50% - 290px));
+  bottom: 28%;
+  background: rgba(50, 20, 55, 0.9);
+  border: 1px solid rgba(255, 123, 191, 0.3);
+  animation-delay: -3.5s;
+}
+
+/* Keyframes */
+@keyframes drift {
+  50% { transform: translate(10vw, 8vw) scale(1.15); }
+}
+@keyframes spin404 {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes float404 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes pulse {
+  50% { opacity: 0.55; transform: scale(0.96); }
+}

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Timeline — Veyra</title>
+    <link rel="stylesheet" href="css/timeline.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link active" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Identity / <b>Timeline</b></span>
+          <div class="top-tools">
+            <button class="round-icon">↗</button
+            ><a class="btn btn-primary btn-small" href="/upload"
+              >Add a moment <span>+</span></a
+            >
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">Your journey, illuminated</p>
+            <h1>The story behind your work.</h1>
+            <p>
+              A living sequence of every meaningful milestone Veyra has
+              understood.
+            </p>
+          </div>
+          <span class="badge">12 milestones · 2023 — now</span>
+        </section>
+        <section class="timeline-wrap">
+          <div class="timeline-year">2026</div>
+          <div class="timeline-line">
+            <article class="event app-card reveal" style="--event: #58e0d0">
+              <div class="event-top">
+                <span class="badge"><i class="dot"></i> Current chapter</span
+                ><span class="event-date">JUL 2026</span>
+              </div>
+              <h3>Building an AI-powered Digital Identity System</h3>
+              <p>
+                Bringing together document intelligence, semantic retrieval, and
+                relationship mapping into a single personal knowledge system.
+              </p>
+              <div class="event-tags">
+                <span>AI</span><span>Product</span><span>Full stack</span>
+              </div>
+            </article>
+            <article class="event app-card reveal" style="--event: #ff7bbf">
+              <div class="event-top">
+                <span class="badge">Project</span
+                ><span class="event-date">MAR 2026</span>
+              </div>
+              <h3>Launched personal AI project portfolio</h3>
+              <p>
+                Curated a portfolio that connects technical projects with the
+                capabilities and outcomes behind them.
+              </p>
+              <div class="event-tags">
+                <span>Portfolio</span><span>Design</span>
+              </div>
+            </article>
+          </div>
+          <div class="timeline-year">2025</div>
+          <div class="timeline-line">
+            <article class="event app-card reveal" style="--event: #ffca7a">
+              <div class="event-top">
+                <span class="badge">Experience</span
+                ><span class="event-date">JUN — AUG 2025</span>
+              </div>
+              <h3>Machine Learning Engineering Intern</h3>
+              <p>
+                Worked on classification models and ML evaluation workflows,
+                translating noisy datasets into useful predictions.
+              </p>
+              <div class="event-tags">
+                <span>Python</span><span>Machine learning</span><span>NLP</span>
+              </div>
+            </article>
+            <article class="event app-card reveal" style="--event: #907cff">
+              <div class="event-top">
+                <span class="badge">Project</span
+                ><span class="event-date">FEB 2025</span>
+              </div>
+              <h3>Completed sentiment analysis capstone</h3>
+              <p>
+                Built a transformer-based classifier and delivered a practical
+                dashboard for interpreting model confidence.
+              </p>
+              <div class="event-tags">
+                <span>Transformers</span><span>Data science</span>
+              </div>
+            </article>
+          </div>
+          <div class="timeline-year">2024</div>
+          <div class="timeline-line">
+            <article class="event app-card reveal" style="--event: #58e0d0">
+              <div class="event-top">
+                <span class="badge">Credential</span
+                ><span class="event-date">AUG 2024</span>
+              </div>
+              <h3>Earned Google Cloud ML certificate</h3>
+              <p>
+                Developed practical foundations in cloud data pipelines, model
+                deployment, and responsible AI.
+              </p>
+              <div class="event-tags">
+                <span>Google Cloud</span><span>ML</span>
+              </div>
+            </article>
+            <article class="event app-card reveal" style="--event: #ff7bbf">
+              <div class="event-top">
+                <span class="badge">Community</span
+                ><span class="event-date">JAN 2024</span>
+              </div>
+              <h3>Joined the Data Science Club</h3>
+              <p>
+                Started collaborating on campus data projects and learning
+                alongside a community of curious builders.
+              </p>
+              <div class="event-tags">
+                <span>Community</span><span>Data</span>
+              </div>
+            </article>
+          </div>
+          <div class="timeline-year">2023</div>
+          <div class="timeline-line">
+            <article class="event app-card reveal" style="--event: #907cff">
+              <div class="event-top">
+                <span class="badge">Foundation</span
+                ><span class="event-date">SEP 2023</span>
+              </div>
+              <h3>Started the Python journey</h3>
+              <p>
+                Built the foundations for a growing interest in automation,
+                data, and intelligent systems.
+              </p>
+              <div class="event-tags">
+                <span>Python</span><span>Learning</span>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/timeline.js"></script>
+  </body>
+</html>

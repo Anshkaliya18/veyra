@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Profile — Veyra</title>
+    <link rel="stylesheet" href="css/profile.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link active" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Identity / <b>Profile</b></span>
+          <div class="top-tools">
+            <a class="side-link" href="/settings"
+              ><span class="side-icon">⚙</span>Settings</a
+            ><button class="round-icon">↗</button>
+          </div>
+        </header>
+        <section class="profile-header app-card reveal">
+          <div class="profile-avatar">{{ user[1][0] }}{{ user[2][0] }}</div>
+          <div>
+            <h1>
+              {{ user[1] }} {{ user[2] }} <span style="font-size: 14px; color: #59dccb">●</span>
+            </h1>
+            <p>AI Builder · Machine Learning Enthusiast · Product Thinker</p>
+            <div class="profile-links">
+              <a href="#">in / linkedin</a><a href="#">⌘ / github</a
+              ><a href="#">↗ / portfolio</a>
+            </div>
+          </div>
+          <a class="btn btn-primary btn-small" href="#"
+            >Share profile <span>↗</span></a
+          >
+        </section>
+        <section class="stat-grid app-section">
+          <article class="app-card stat-card reveal" style="--glow: #806bff">
+            <div class="stat-value">
+              94<span style="font-size: 14px">%</span>
+            </div>
+            <div class="stat-label">Identity completeness</div>
+            <div class="stat-trend">Excellent</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #55ddcf">
+            <div class="stat-value">18</div>
+            <div class="stat-label">Verified skills</div>
+            <div class="stat-trend">Across 4 domains</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ff83bd">
+            <div class="stat-value">05</div>
+            <div class="stat-label">Signature projects</div>
+            <div class="stat-trend">2 featured</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ffca7a">
+            <div class="stat-value">06</div>
+            <div class="stat-label">Credentials</div>
+            <div class="stat-trend">All verified</div>
+          </article>
+        </section>
+        <section class="profile-grid app-section">
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Signature work</h2>
+                <p class="card-sub">Projects that define your current story</p>
+              </div>
+              <a class="kicker" href="#">View all</a>
+            </div>
+            <div class="project">
+              <h3>AI Digital Identity System</h3>
+              <p>
+                A personal knowledge layer that transforms scattered documents
+                into a connected, searchable identity.
+              </p>
+              <span>AI · NLP · Product systems</span>
+            </div>
+            <div class="project">
+              <h3>Sentiment Analysis Engine</h3>
+              <p>
+                Transformer-based review classification with an explainable
+                confidence dashboard.
+              </p>
+              <span>Python · NLP · Data science</span>
+            </div>
+            <div class="project">
+              <h3>Expense Manager</h3>
+              <p>
+                A thoughtful personal finance tool with intuitive data
+                visualisation.
+              </p>
+              <span>Product design · React</span>
+            </div>
+          </article>
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Skills in focus</h2>
+                <p class="card-sub">Evidence-backed capabilities</p>
+              </div>
+              <a class="kicker" href="/graph">Graph ↗</a>
+            </div>
+            <div class="skill-cloud">
+              <span class="skill">Python</span
+              ><span class="skill">Machine learning</span
+              ><span class="skill">NLP</span
+              ><span class="skill">Data analysis</span
+              ><span class="skill">Product design</span
+              ><span class="skill">Figma</span><span class="skill">SQL</span
+              ><span class="skill">Cloud</span>
+            </div>
+            <div class="profile-timeline journey">
+              <div class="journey-item">
+                <b>Machine learning</b
+                ><span>6 sources of evidence · Advanced</span>
+              </div>
+              <div class="journey-item">
+                <b>Product design</b><span>4 sources of evidence · Strong</span>
+              </div>
+            </div>
+          </article>
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Recognitions</h2>
+                <p class="card-sub">Credentials and achievements</p>
+              </div>
+            </div>
+            <div class="achievement">
+              <span class="achievement-icon">✦</span>
+              <div>
+                <b>Google Cloud ML Certificate</b>
+                <p>Google Cloud · Aug 2024</p>
+              </div>
+            </div>
+            <div class="achievement">
+              <span class="achievement-icon">★</span>
+              <div>
+                <b>Data Science Club finalist</b>
+                <p>Campus Innovation Challenge · 2025</p>
+              </div>
+            </div>
+            <div class="achievement">
+              <span class="achievement-icon">⌁</span>
+              <div>
+                <b>ML Engineering Internship</b>
+                <p>Professional experience · 2025</p>
+              </div>
+            </div>
+          </article>
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">The current arc</h2>
+                <p class="card-sub">Your story in three moments</p>
+              </div>
+              <a class="kicker" href="/timeline">Timeline ↗</a>
+            </div>
+            <div class="journey">
+              <div class="journey-item">
+                <b>Building AI identity systems</b
+                ><span>2026 · Current chapter</span>
+              </div>
+              <div class="journey-item">
+                <b>Applied ML in production</b><span>2025 · Internship</span>
+              </div>
+              <div class="journey-item">
+                <b>Cloud ML foundations</b><span>2024 · Credential</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/profile.js"></script>
+  </body>
+</html>

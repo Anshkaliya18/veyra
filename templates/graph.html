@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Knowledge graph — Veyra</title>
+    <link rel="stylesheet" href="css/graph.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link active" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Identity / <b>Knowledge graph</b></span>
+          <div class="top-tools">
+            <button class="round-icon" id="reset-graph">⌾</button
+            ><button class="round-icon" id="zoom-out">−</button
+            ><button class="round-icon" id="zoom-in">+</button>
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">The connective tissue</p>
+            <h1>Your identity, in context.</h1>
+            <p>
+              Explore the hidden connections between your skills, work,
+              credentials, and ambitions.
+            </p>
+          </div>
+          <span class="badge"><i class="dot"></i> 24 entities connected</span>
+        </section>
+        <section class="app-card graph-stage reveal" id="graph-stage">
+          <div class="graph-canvas" id="graph-canvas">
+            <i
+              class="edge"
+              style="
+                left: 50%;
+                top: 50%;
+                width: 240px;
+                transform: rotate(-143deg);
+              "
+            ></i
+            ><i
+              class="edge"
+              style="
+                left: 50%;
+                top: 50%;
+                width: 235px;
+                transform: rotate(-35deg);
+              "
+            ></i
+            ><i
+              class="edge"
+              style="
+                left: 50%;
+                top: 50%;
+                width: 220px;
+                transform: rotate(35deg);
+              "
+            ></i
+            ><i
+              class="edge"
+              style="
+                left: 50%;
+                top: 50%;
+                width: 238px;
+                transform: rotate(143deg);
+              "
+            ></i
+            ><i
+              class="edge"
+              style="
+                left: 47%;
+                top: 49%;
+                width: 130px;
+                transform: rotate(-96deg);
+              "
+            ></i
+            ><i
+              class="edge"
+              style="
+                left: 53%;
+                top: 53%;
+                width: 150px;
+                transform: rotate(73deg);
+              "
+            ></i>
+            <div class="node center" data-label="You">{{ user[1][0] }}{{ user[2][0] }}</div>
+            <div class="node n1" data-label="Python">Py</div>
+            <div class="node n2" data-label="ML Internship">ML</div>
+            <div class="node n3" data-label="Google Cloud">GC</div>
+            <div class="node n4" data-label="NLP Project">NLP</div>
+            <div class="node n5" data-label="Data Science">DS</div>
+            <div class="node n6" data-label="Product Design">PD</div>
+          </div>
+        </section>
+        <div class="graph-legend">
+          <span
+            ><i class="legend-dot" style="background: #58e0d0"></i
+            >Identity</span
+          ><span
+            ><i class="legend-dot" style="background: #8875fa"></i>Skill</span
+          ><span
+            ><i class="legend-dot" style="background: #ff7cbf"></i
+            >Experience</span
+          ><span
+            ><i class="legend-dot" style="background: #f2b658"></i
+            >Credential</span
+          >
+        </div>
+        <div class="graph-tips">
+          <span>Drag the canvas to explore</span
+          ><span>Scroll or use + / − to zoom</span
+          ><span>Hover a node to reveal its role</span>
+        </div>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/graph.js"></script>
+  </body>
+</html>

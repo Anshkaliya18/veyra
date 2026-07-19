@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Overview — Veyra</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link active" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>Overview</b></span>
+          <div class="top-tools">
+            <button class="round-icon">⌕</button
+            ><button class="round-icon">♧</button
+            ><a class="btn btn-primary btn-small" href="/upload"
+              >Upload <span>↑</span></a
+            >
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">{{ current_day }}, {{ current_date }}</p>
+            <h1>{{ greeting }}, {{ user[1] }}.</h1>
+            <p>Here’s how your professional story is taking shape.</p>
+          </div>
+          <span class="badge"
+            ><i class="dot"></i> Identity health: Excellent</span
+          >
+        </section>
+        <section class="stat-grid">
+          <article class="app-card stat-card reveal" style="--glow: #806bff">
+            <span class="stat-icon">▤</span>
+            <div class="stat-value">24</div>
+            <div class="stat-label">Documents understood</div>
+            <div class="stat-trend">↗ +3 this month</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #55ddcf">
+            <span class="stat-icon">✦</span>
+            <div class="stat-value">18</div>
+            <div class="stat-label">Verified skills</div>
+            <div class="stat-trend">↗ +2 discovered</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ff83bd">
+            <span class="stat-icon">⌁</span>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Journey milestones</div>
+            <div class="stat-trend">↗ Timeline current</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ffca7a">
+            <span class="stat-icon">◌</span>
+            <div class="stat-value">
+              94<span style="font-size: 16px">%</span>
+            </div>
+            <div class="stat-label">Identity completeness</div>
+            <div class="stat-trend">↗ Top 8% this month</div>
+          </article>
+        </section>
+        <section class="dashboard-grid app-section">
+          <article class="app-card wide-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Your identity is compounding</h2>
+                <p class="card-sub">Growth signals across the last 6 months</p>
+              </div>
+              <span class="badge">+18.4%</span>
+            </div>
+            <div class="chart-area">
+              <svg viewBox="0 0 600 210" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
+                    <stop stop-color="#7764ff" stop-opacity=".55" />
+                    <stop offset="1" stop-color="#7764ff" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0 180 C40 170 55 128 100 145 S155 112 200 125 S255 83 300 102 S362 65 400 80 S450 39 490 58 S550 18 600 27 L600 210 L0 210Z"
+                  fill="url(#area)"
+                />
+                <path
+                  d="M0 180 C40 170 55 128 100 145 S155 112 200 125 S255 83 300 102 S362 65 400 80 S450 39 490 58 S550 18 600 27"
+                  fill="none"
+                  stroke="#8a7bff"
+                  stroke-width="3"
+                />
+              </svg>
+            </div>
+            <div class="chart-labels">
+              <span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span
+              ><span>JUN</span><span>JUL</span>
+            </div>
+          </article>
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Recent understanding</h2>
+                <p class="card-sub">Veyra found new context</p>
+              </div>
+              <a href="/upload" class="kicker">View all</a>
+            </div>
+            <div class="activity-list">
+              <div class="activity">
+                <span class="file-icon">PDF</span>
+                <div>
+                  <b>ML Internship Letter</b
+                  ><span>3 skills and 1 milestone surfaced</span>
+                </div>
+                <time>2h</time>
+              </div>
+              <div class="activity">
+                <span
+                  class="file-icon"
+                  style="color: #a5f2e7; background: rgba(88, 224, 208, 0.13)"
+                  >DOC</span
+                >
+                <div>
+                  <b>Product case study</b
+                  ><span>Linked to your UI/UX projects</span>
+                </div>
+                <time>1d</time>
+              </div>
+              <div class="activity">
+                <span
+                  class="file-icon"
+                  style="color: #ffe094; background: rgba(255, 202, 122, 0.13)"
+                  >IMG</span
+                >
+                <div>
+                  <b>Google Cloud certificate</b
+                  ><span>Credential verified and mapped</span>
+                </div>
+                <time>3d</time>
+              </div>
+            </div>
+          </article>
+        </section>
+        <section class="dashboard-grid app-section">
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Skills in your orbit</h2>
+                <p class="card-sub">Extracted with high confidence</p>
+              </div>
+              <a href="/profile" class="kicker">Profile ↗</a>
+            </div>
+            <div class="skill-cloud">
+              <span class="skill">Python</span
+              ><span class="skill">Machine learning</span
+              ><span class="skill">Product design</span
+              ><span class="skill">SQL</span><span class="skill">Figma</span
+              ><span class="skill">NLP</span><span class="skill">React</span
+              ><span class="skill">Data analysis</span>
+            </div>
+            <form class="quick-search" action="/search">
+              <input placeholder="Ask anything about your journey…" /><button
+                class="btn btn-primary btn-small"
+              >
+                Ask AI
+              </button>
+            </form>
+          </article>
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Next on your timeline</h2>
+                <p class="card-sub">The story Veyra sees</p>
+              </div>
+              <a href="/timeline" class="kicker">Open ↗</a>
+            </div>
+            <div class="journey">
+              <div class="journey-item">
+                <b>AI portfolio launch</b><span>Next chapter · 2026</span>
+              </div>
+              <div class="journey-item">
+                <b>ML engineering internship</b
+                ><span>Professional experience · 2025</span>
+              </div>
+              <div class="journey-item">
+                <b>Data science certification</b><span>Credential · 2024</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

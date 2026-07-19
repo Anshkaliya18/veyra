@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Veyra — Your intelligence, connected</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/motion.css" />
+  </head>
+  <body>
+    <div class="grid-noise"></div>
+    <main class="shell">
+      <nav class="nav">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <div class="nav-links">
+          <a class="active" href="#product">Product</a
+          ><a href="#how-it-works">How it works</a><a href="#stories">Stories</a
+          ><a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+
+            {% if session.get('user_id') %}
+
+                <a href="{{ url_for('dashboard') }}"
+                  class="btn btn-secondary btn-small">
+
+                    Dashboard
+
+                </a>
+
+                <a href="{{ url_for('profile') }}"
+                  class="btn btn-primary btn-small profile-btn">
+
+                    {{ session.get('firstName')[0] }}{{ session.get('lastName')[0] }}
+
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}"
+                  class="btn btn-secondary btn-small">
+
+                    Log in
+
+                </a>
+
+                <a href="{{ url_for('signup') }}"
+                  class="btn btn-primary btn-small"
+                  data-magnetic>
+
+                    Get started <span>→</span>
+
+                </a>
+
+            {% endif %}
+
+        </div>
+        <button class="mobile-menu">☰</button>
+      </nav>
+      <section class="hero">
+        <div class="hero-identity-art" aria-hidden="true">
+          <img src="assets/images/identity-constellation.png" alt="" />
+        </div>
+        <div class="orbital"></div>
+        <span class="badge"
+          ><i class="dot"></i> Your personal intelligence layer</span
+        >
+        <h1>
+          Everything you’ve done,<br /><span class="gradient-text"
+            >finally connected.</span
+          >
+        </h1>
+        <p class="hero-copy">
+          Veyra turns the documents scattered across your life into a living,
+          searchable map of who you are and where you’re going.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/signup" data-magnetic
+            >Build your identity <span>→</span></a
+          ><a class="btn btn-secondary" href="#product"
+            >See how it works <span>↘</span></a
+          >
+        </div>
+        <div class="hero-note">
+          <span>✦ Private by design</span><span>✦ Built for your journey</span
+          ><span>✦ AI-powered</span>
+        </div>
+      </section>
+      <section class="dashboard-stage reveal">
+        <div class="hero-dash">
+          <div class="preview-bar">
+            <i></i><i></i><i></i
+            ><span class="preview-title">veyra.app / workspace</span>
+          </div>
+          <div class="dash-preview-body">
+            <aside class="preview-nav">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </aside>
+            <div class="preview-content">
+              <h3>Good afternoon, Ansh.</h3>
+              <div class="preview-stats">
+                <div class="preview-stat"><span>Documents</span><b>24</b></div>
+                <div class="preview-stat">
+                  <span>Verified skills</span><b>18</b>
+                </div>
+                <div class="preview-stat"><span>Milestones</span><b>12</b></div>
+                <div class="preview-stat">
+                  <span>Identity score</span><b>94</b>
+                </div>
+              </div>
+              <div class="preview-panels">
+                <div class="mock-chart"><div class="chart-line"></div></div>
+                <div class="mock-list">
+                  <div class="list-line"></div>
+                  <div class="list-line"></div>
+                  <div class="list-line"></div>
+                  <div class="list-line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="float-chip chip-a">✦ 7 skills discovered</span
+        ><span class="float-chip chip-b">⌁ Timeline updated</span>
+      </section>
+    </main>
+    <section class="section" id="product">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="eyebrow">A complete intelligence system</p>
+          <h2 class="section-title">Your achievements are more than files.</h2>
+          <p class="section-copy">
+            Every upload becomes a connected piece of your story — understood,
+            organized, and ready when you need it.
+          </p>
+        </div>
+        <div class="features">
+          <article class="feature-card glass tilt reveal">
+            <div class="feature-icon">✦</div>
+            <h3>AI understands the context</h3>
+            <p>
+              Veyra sees the skills, organizations, achievements, and outcomes
+              inside every document — not just its filename.
+            </p>
+            <i class="feature-line"></i>
+          </article>
+          <article class="feature-card glass tilt reveal">
+            <div class="feature-icon">⌁</div>
+            <h3>Your journey, in motion</h3>
+            <p>
+              Watch a precise timeline emerge from the moments that made you:
+              certificates, projects, internships, and more.
+            </p>
+            <i class="feature-line"></i>
+          </article>
+          <article class="feature-card glass tilt reveal">
+            <div class="feature-icon">◌</div>
+            <h3>Ask, don’t hunt</h3>
+            <p>
+              Natural language search finds the proof behind every question,
+              then surfaces the original documents instantly.
+            </p>
+            <i class="feature-line"></i>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="how-it-works">
+      <div class="shell">
+        <div class="showcase-grid">
+          <article class="showcase glass reveal">
+            <p class="eyebrow">Your evolving story</p>
+            <h3>
+              See the trajectory,<br /><span class="gradient-text"
+                >not just the archive.</span
+              >
+            </h3>
+            <p>
+              AI recognizes meaningful moments and arranges them into a clear
+              narrative of growth.
+            </p>
+            <div class="timeline-mini">
+              <div><i></i><b>2023</b> Python foundations</div>
+              <div><i></i><b>2024</b> Data science certification</div>
+              <div><i></i><b>2025</b> ML engineering internship</div>
+              <div><i></i><b>2026</b> AI project portfolio</div>
+            </div>
+          </article>
+          <article class="showcase glass reveal">
+            <p class="eyebrow">The context behind the work</p>
+            <h3>
+              Discover every<br /><span class="gradient-text">connection.</span>
+            </h3>
+            <p>
+              Skills, credentials, work, and people form a graph that brings
+              your professional identity into focus.
+            </p>
+            <div class="graph-mini"><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="shell">
+        <div class="stats-band glass reveal">
+          <div class="stat-band">
+            <b class="count" data-count="24">0</b
+            ><span>documents understood</span>
+          </div>
+          <div class="stat-band">
+            <b class="count" data-count="18">0</b><span>skills surfaced</span>
+          </div>
+          <div class="stat-band">
+            <b class="count" data-count="12">0</b><span>milestones mapped</span>
+          </div>
+          <div class="stat-band">
+            <b class="count" data-count="100">0</b><span>% yours, always</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="stories">
+      <div class="shell">
+        <div class="section-head reveal">
+          <p class="eyebrow">Made for momentum</p>
+          <h2 class="section-title">The quiet confidence of being ready.</h2>
+        </div>
+        <div class="testimonials">
+          <article class="quote glass reveal">
+            <p>
+              “I used to keep six folders for my application documents. Veyra
+              made it feel like I finally had a narrative, not just evidence.”
+            </p>
+            <div class="quote-person">
+              <span class="avatar">AK</span>
+              <div><b>Arjun Kumar</b><small>Computer Science, 2026</small></div>
+            </div>
+          </article>
+          <article class="quote glass reveal">
+            <p>
+              “The graph showed me that my design projects had a much stronger
+              product story than I knew. It changed how I presented myself.”
+            </p>
+            <div class="quote-person">
+              <span class="avatar">MS</span>
+              <div><b>Maya Shah</b><small>Product Designer</small></div>
+            </div>
+          </article>
+          <article class="quote glass reveal">
+            <p>
+              “The search is magic. I asked for work involving Python and Veyra
+              found the reports I’d completely forgotten I had.”
+            </p>
+            <div class="quote-person">
+              <span class="avatar">RP</span>
+              <div><b>Rohan Patel</b><small>ML Engineer</small></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="faq">
+      <div class="shell">
+        <div class="section-head">
+          <p class="eyebrow">Answers, clearly</p>
+          <h2 class="section-title">A few things you might ask.</h2>
+        </div>
+        <div class="faq">
+          <article class="faq-item open">
+            <button class="faq-question">
+              What does Veyra do with my documents? <span>+</span>
+            </button>
+            <div class="faq-answer">
+              It extracts useful context — skills, dates, projects, and
+              achievements — to build a private, searchable identity map. Your
+              original files remain connected to every insight.
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-question">
+              Can I control who sees my identity? <span>+</span>
+            </button>
+            <div class="faq-answer">
+              Yes. Veyra is designed as a private workspace. You decide what
+              stays private and what becomes part of a shareable profile.
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-question">
+              What kinds of files can I add? <span>+</span>
+            </button>
+            <div class="faq-answer">
+              PDFs, DOCX files, images, text files, portfolio links, and
+              repositories can all become part of your connected journey.
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <footer class="shell footer">
+      <a class="brand" href="/"
+        ><i class="brand-mark"></i
+        ><span class="brand-name">ve<span>y</span>ra</span></a
+      ><span>© 2026 Veyra. Your story, beautifully connected.</span>
+      <div class="footer-links">
+        <a href="/login">Log in</a
+        ><a href="/signup">Create identity</a>
+      </div>
+    </footer>
+    <script src="js/shared.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

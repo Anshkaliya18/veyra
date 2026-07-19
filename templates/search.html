@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>AI Search — Veyra</title>
+    <link rel="stylesheet" href="css/search.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link active" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/graph"
+              ><span class="side-icon">◎</span>Knowledge graph</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>AI search</b></span>
+          <div class="top-tools">
+            <span class="badge"><i class="dot"></i> Veyra AI online</span
+            ><button class="round-icon">♧</button>
+          </div>
+        </header>
+        <section class="search-hero">
+          <p class="eyebrow">Ask your story anything</p>
+          <h1>Find the signal in your journey.</h1>
+          <p class="muted" style="font-size: 12px; margin: 0 0 18px">
+            Search by meaning — not just by words or filenames.
+          </p>
+          <form class="search-field" id="search-form">
+            <span>⌕</span
+            ><input
+              id="search-input"
+              autofocus
+              value="Show me everything related to machine learning"
+              aria-label="Search your identity"
+            /><button class="btn btn-primary btn-small">
+              Ask Veyra <span>→</span>
+            </button>
+          </form>
+          <div class="suggestions">
+            <button class="suggestion">My latest certificates</button
+            ><button class="suggestion">Projects using Python</button
+            ><button class="suggestion">Show internship experience</button
+            ><button class="suggestion">What are my strongest skills?</button>
+          </div>
+        </section>
+        <section class="search-layout">
+          <aside class="app-card filters">
+            <p class="kicker">Filter results</p>
+            <div class="filter-group">
+              <b class="filter-title">TYPE</b
+              ><label class="filter-option"
+                ><input type="checkbox" checked /> All sources
+                <span style="margin-left: auto">24</span></label
+              ><label class="filter-option"
+                ><input type="checkbox" /> Documents
+                <span style="margin-left: auto">8</span></label
+              ><label class="filter-option"
+                ><input type="checkbox" /> Projects
+                <span style="margin-left: auto">5</span></label
+              ><label class="filter-option"
+                ><input type="checkbox" /> Credentials
+                <span style="margin-left: auto">6</span></label
+              >
+            </div>
+            <div class="filter-group">
+              <b class="filter-title">TIME</b
+              ><label class="filter-option"
+                ><input type="radio" name="time" checked /> Any time</label
+              ><label class="filter-option"
+                ><input type="radio" name="time" /> Last 12 months</label
+              ><label class="filter-option"
+                ><input type="radio" name="time" /> 2024 – 2025</label
+              >
+            </div>
+          </aside>
+          <div>
+            <div class="results-head">
+              <span id="results-copy">Veyra found 4 connected results</span
+              ><span>Sorted by relevance ↓</span>
+            </div>
+            <div id="search-results">
+              <article class="result app-card reveal">
+                <span class="file-icon">PDF</span>
+                <div>
+                  <h3>Machine Learning Engineering Internship</h3>
+                  <p>
+                    Applied <mark>machine learning</mark> models for transaction
+                    classification, improving prediction accuracy by 18%. Built
+                    a production-ready evaluation workflow in Python.
+                  </p>
+                  <div class="result-meta">
+                    <span>INTERNSHIP LETTER</span><span>·</span
+                    ><span>JUN 2025</span><span>·</span><span>Python, NLP</span>
+                  </div>
+                </div>
+                <span class="confidence">98% match</span>
+              </article>
+              <article class="result app-card reveal">
+                <span
+                  class="file-icon"
+                  style="color: #a5f2e7; background: rgba(88, 224, 208, 0.13)"
+                  >DOC</span
+                >
+                <div>
+                  <h3>Sentiment Analysis — Final Project</h3>
+                  <p>
+                    A natural language processing project that trained and
+                    evaluated a <mark>machine learning</mark> classifier on
+                    15,000 customer reviews using transformers.
+                  </p>
+                  <div class="result-meta">
+                    <span>PROJECT REPORT</span><span>·</span
+                    ><span>FEB 2025</span><span>·</span><span>Python, NLP</span>
+                  </div>
+                </div>
+                <span class="confidence">95% match</span>
+              </article>
+              <article class="result app-card reveal">
+                <span
+                  class="file-icon"
+                  style="color: #ffe094; background: rgba(255, 202, 122, 0.13)"
+                  >IMG</span
+                >
+                <div>
+                  <h3>Google Cloud Machine Learning Certificate</h3>
+                  <p>
+                    Completed credential demonstrating practical foundations in
+                    cloud-based <mark>machine learning</mark> workflows, data
+                    pipelines, and model deployment.
+                  </p>
+                  <div class="result-meta">
+                    <span>CERTIFICATE</span><span>·</span><span>AUG 2024</span
+                    ><span>·</span><span>GCP</span>
+                  </div>
+                </div>
+                <span class="confidence">91% match</span>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/search.js"></script>
+  </body>
+</html>
