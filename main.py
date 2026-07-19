@@ -1,12 +1,13 @@
 import os
 import sqlite3
-import psycopg2
+from psycopg2.pool import SimpleConnectionPool
 from flask import Flask, jsonify, redirect, render_template, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
+db_pool = None
 
 # Database wrapper to allow running with PostgreSQL (via DATABASE_URL)
 # or falling back to a local SQLite DB for easy local development.
@@ -51,19 +52,60 @@ class ConnectionWrapper:
 
 
 def get_db_connection():
-    global DB_TYPE
-    database_url = os.getenv('DATABASE_URL')
-    if database_url:
-        DB_TYPE = 'postgres'
-        return psycopg2.connect(database_url, sslmode='require')
+    global DB_TYPE, db_pool
 
-    # fallback to sqlite
-    DB_TYPE = 'sqlite'
-    sqlite_path = os.path.join(os.path.dirname(__file__), 'veyra.db')
-    conn = sqlite3.connect(sqlite_path, check_same_thread=False)
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url:
+        DB_TYPE = "postgres"
+
+        if db_pool is None:
+            db_pool = SimpleConnectionPool(
+                minconn=1,
+                maxconn=10,
+                dsn=database_url
+            )
+
+        return db_pool.getconn()
+
+    DB_TYPE = "sqlite"
+
+    sqlite_path = os.path.join(
+        os.path.dirname(__file__),
+        "veyra.db"
+    )
+
+    conn = sqlite3.connect(
+        sqlite_path,
+        check_same_thread=False
+    )
+
     conn.row_factory = sqlite3.Row
+
     return ConnectionWrapper(conn, DB_TYPE)
 
+def release_db_connection(conn):
+    global DB_TYPE
+
+    if DB_TYPE == "postgres":
+        db_pool.putconn(conn)
+    else:
+        conn.close()
+
+def get_logged_in_user():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT * FROM users WHERE id=%s",
+            (session["user_id"],)
+        )
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        release_db_connection(conn)
 
 def init_db():
     conn = get_db_connection()
@@ -98,7 +140,7 @@ def init_db():
             )
         conn.commit()
     finally:
-        conn.close()
+        release_db_connection(conn)
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -108,8 +150,8 @@ init_db()
 @app.route('/')
 def home():
     # If logged in, send to dashboard; otherwise show public index page
-    if 'user_id' in session:
-        return redirect('/dashboard')
+    if 'user_id' not in session:
+        return redirect('/')
 
     return render_template('index.html')
 
@@ -158,7 +200,7 @@ def signup():
             return jsonify({'error': str(exc)}), 500
         finally:
             cursor.close()
-            conn.close()
+            release_db_connection(conn)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'redirect': '/login'}), 200
@@ -220,7 +262,7 @@ def login():
         finally:
 
             cursor.close()
-            conn.close()
+            release_db_connection(conn)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({
@@ -235,20 +277,9 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id = %s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
+    user = get_logged_in_user()
 
     today = datetime.now()
     hour = today.hour
@@ -277,126 +308,63 @@ def dashboard():
 @app.route('/profile')
 def profile():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
     
     return render_template("profile.html",user=user)
 
 @app.route('/upload')
 def upload():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
 
     return render_template("upload.html",user=user)
 
 @app.route('/graph')
 def graph():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
 
     return render_template("graph.html",user=user)
 
 @app.route('/search')
 def ai_search():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
 
     return render_template("search.html",user=user)
 
 @app.route('/timeline')
 def timeline():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
 
     return render_template("timeline.html",user=user)
 
 @app.route('/settings')
 def settings():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
+    user = get_logged_in_user()
 
     return render_template("settings.html",user=user)
 
 @app.route('/404')
 def error():
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()   
+    user = get_logged_in_user()
 
     return render_template("404.html",user=user)
 
