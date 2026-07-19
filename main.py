@@ -1,24 +1,76 @@
 import os
+import sqlite3
 import psycopg2
 from flask import Flask, jsonify, redirect, render_template, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Database wrapper to allow running with PostgreSQL (via DATABASE_URL)
+# or falling back to a local SQLite DB for easy local development.
+DB_TYPE = None
+
+
+class CursorWrapper:
+    def __init__(self, cursor, db_type):
+        self._cursor = cursor
+        self._db_type = db_type
+
+    def execute(self, query, params=()):
+        if self._db_type == 'sqlite':
+            query = query.replace('%s', '?')
+        return self._cursor.execute(query, params)
+
+    def executemany(self, query, seq_of_params):
+        if self._db_type == 'sqlite':
+            query = query.replace('%s', '?')
+        return self._cursor.executemany(query, seq_of_params)
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+
+class ConnectionWrapper:
+    def __init__(self, conn, db_type):
+        self._conn = conn
+        self._db_type = db_type
+
+    def cursor(self):
+        return CursorWrapper(self._conn.cursor(), self._db_type)
+
+    def commit(self):
+        return self._conn.commit()
+
+    def close(self):
+        return self._conn.close()
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
 
 def get_db_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=int(os.getenv("DB_PORT", "5432")),
-        database=os.getenv("DB_NAME", "digital_identity"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "Ansh@9911"),
-    )
+    global DB_TYPE
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        DB_TYPE = 'postgres'
+        return psycopg2.connect(database_url, sslmode='require')
+
+    # fallback to sqlite
+    DB_TYPE = 'sqlite'
+    sqlite_path = os.path.join(os.path.dirname(__file__), 'veyra.db')
+    conn = sqlite3.connect(sqlite_path, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return ConnectionWrapper(conn, DB_TYPE)
 
 
 def init_db():
     conn = get_db_connection()
     try:
-        with conn.cursor() as cursor:
-            cursor.execute(
+        cur = conn.cursor()
+        if DB_TYPE == 'postgres':
+            cur.execute(
                 """
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
@@ -30,32 +82,36 @@ def init_db():
                 )
                 """
             )
-            conn.commit()
+        else:
+            # sqlite
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    firstName TEXT NOT NULL,
+                    lastName TEXT,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        conn.commit()
     finally:
         conn.close()
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
 init_db()
 
 @app.route('/')
 def home():
-    if 'user_id' not in session:
-        return redirect('home')
+    # If logged in, send to dashboard; otherwise show public index page
+    if 'user_id' in session:
+        return redirect('/dashboard')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM users WHERE id=%s",
-        (session["user_id"],)
-    )
-
-    user = cursor.fetchone()
-    conn.close()
-
-    return render_template('index.html',user=user)
+    return render_template('index.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -179,7 +235,7 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -221,7 +277,7 @@ def dashboard():
 @app.route('/profile')
 def profile():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -239,7 +295,7 @@ def profile():
 @app.route('/upload')
 def upload():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -257,7 +313,7 @@ def upload():
 @app.route('/graph')
 def graph():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -275,7 +331,7 @@ def graph():
 @app.route('/search')
 def ai_search():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -293,7 +349,7 @@ def ai_search():
 @app.route('/timeline')
 def timeline():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -311,7 +367,7 @@ def timeline():
 @app.route('/settings')
 def settings():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -329,7 +385,7 @@ def settings():
 @app.route('/404')
 def error():
     if 'user_id' not in session:
-        return redirect('home')
+        return redirect('/login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
