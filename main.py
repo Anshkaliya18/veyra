@@ -149,10 +149,7 @@ init_db()
 
 @app.route('/')
 def home():
-    # If logged in, send to dashboard; otherwise show public index page
-    if 'user_id' in session:
-        return redirect('/dashboard')
-
+    
     return render_template('index.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
