@@ -1,12 +1,22 @@
 import os
 import sqlite3
+import psycopg2
 from psycopg2.pool import SimpleConnectionPool
 from flask import Flask, jsonify, redirect, render_template, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from dotenv import load_dotenv
+import uuid
+from werkzeug.utils import secure_filename
+from supabase import create_client
 
 load_dotenv()
+database_url = os.getenv("DATABASE_URL")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")      # Service Role Key
+BUCKET = "documents"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 db_pool = None
 
 # Database wrapper to allow running with PostgreSQL (via DATABASE_URL)
@@ -124,6 +134,19 @@ def init_db():
                 )
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS uploaded_files (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    original_filename TEXT NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    content_type TEXT,
+                    file_size INTEGER,
+                    uploaded_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
         else:
             # sqlite
             cur.execute(
@@ -135,6 +158,19 @@ def init_db():
                     email TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS uploaded_files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    original_filename TEXT NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    content_type TEXT,
+                    file_size INTEGER,
+                    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
                 """
             )
@@ -311,14 +347,197 @@ def profile():
     
     return render_template("profile.html",user=user)
 
-@app.route('/upload')
-def upload():
-    if 'user_id' not in session:
-        return redirect('/')
+@app.route("/upload", methods=["GET", "POST"])
+def upload_file():
 
-    user = get_logged_in_user()
+    if request.method == "GET":
+        if "user_id" not in session:
+            return redirect("/")
 
-    return render_template("upload.html",user=user)
+        user = get_logged_in_user()
+
+        return render_template("upload.html", user=user)
+
+    if "user_id" not in session:
+        return jsonify({"success": False, "message": "Login required"}), 401
+
+    if "file" not in request.files:
+        return jsonify({"success": False, "message": "No file selected"}), 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"success": False, "message": "Empty filename"}), 400
+
+    user_id = session["user_id"]
+
+    original_filename = secure_filename(file.filename)
+
+    unique_name = f"{uuid.uuid4()}_{original_filename}"
+
+    storage_path = f"user_{user_id}/{unique_name}"
+
+    try:
+
+        file_bytes = file.read()
+
+        # Upload to Supabase Storage
+        supabase.storage.from_(BUCKET).upload(
+            path=storage_path,
+            file=file_bytes,
+            file_options={
+                "content-type": file.content_type
+            }
+        )
+
+        # Save metadata in the database
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        try:
+            cur.execute("""
+                INSERT INTO uploaded_files
+                (
+                    user_id,
+                    original_filename,
+                    storage_path,
+                    content_type,
+                    file_size
+                )
+                VALUES (%s,%s,%s,%s,%s)
+            """, (
+
+                user_id,
+                original_filename,
+                storage_path,
+                file.content_type,
+                len(file_bytes)
+
+            ))
+
+            conn.commit()
+        finally:
+            cur.close()
+            release_db_connection(conn)
+
+        return jsonify({
+            "success": True,
+            "message": "Upload successful",
+            "storage_path": storage_path
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@app.route("/api/files")
+def api_files():
+
+    if "user_id" not in session:
+        return jsonify([]), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+
+        cur.execute("""
+            SELECT
+                id,
+                original_filename,
+                storage_path,
+                file_size,
+                content_type,
+                uploaded_at
+            FROM uploaded_files
+            WHERE user_id=%s
+            ORDER BY uploaded_at DESC
+        """, (session["user_id"],))
+
+        rows = cur.fetchall()
+
+        files = []
+
+        for row in rows:
+
+            storage_path = row[2]
+
+            try:
+                folder = storage_path.rsplit("/", 1)[0]
+                filename = storage_path.rsplit("/", 1)[1]
+
+                objects = supabase.storage.from_(BUCKET).list(folder)
+
+                exists = any(obj["name"] == filename for obj in objects)
+
+            except Exception:
+                exists = False
+
+            if exists:
+                files.append({
+                    "id": row[0],
+                    "name": row[1],
+                    "size": row[3],
+                    "type": row[4],
+                    "uploaded_at": str(row[5])
+                })
+            else:
+                # Remove orphan database record
+                cur.execute(
+                    "DELETE FROM uploaded_files WHERE id=%s",
+                    (row[0],)
+                )
+
+        conn.commit()
+
+        return jsonify(files)
+
+    finally:
+        cur.close()
+        release_db_connection(conn)
+
+@app.route("/delete-file/<int:file_id>", methods=["DELETE"])
+def delete_file(file_id):
+
+    if "user_id" not in session:
+        return jsonify({"success": False}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute("""
+            SELECT storage_path
+            FROM uploaded_files
+            WHERE id=%s AND user_id=%s
+        """, (file_id, session["user_id"]))
+
+        row = cur.fetchone()
+
+        if not row:
+            return jsonify({"success": False, "message": "File not found"}), 404
+
+        storage_path = row[0]
+
+        # Delete from Supabase Storage
+        supabase.storage.from_(BUCKET).remove([storage_path])
+
+        # Delete from database
+        cur.execute("""
+            DELETE FROM uploaded_files
+            WHERE id=%s
+        """, (file_id,))
+
+        conn.commit()
+
+        return jsonify({"success": True})
+
+    finally:
+        cur.close()
+        release_db_connection(conn)
 
 @app.route('/graph')
 def graph():
@@ -369,4 +588,5 @@ def page_not_found(e):
     ), 404
 
 if __name__ == '__main__':
+    print(app.url_map)
     app.run(debug=True)
