@@ -356,14 +356,17 @@ def settings():
 
     return render_template("settings.html",user=user)
 
-@app.route('/404')
-def error():
-    if 'user_id' not in session:
-        return redirect('/')
+@app.errorhandler(404)
+def page_not_found(e):
+    user = None
 
-    user = get_logged_in_user()
+    if "user_id" in session:
+        user = get_logged_in_user()
 
-    return render_template("404.html",user=user)
+    return render_template(
+        "404.html",
+        user=user
+    ), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
