@@ -16,6 +16,36 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")      # Service Role Key
 BUCKET = "documents"
 
+# --- File upload validation -------------------------------------------------
+# Server-side allow-list of accepted file extensions (lowercase, no dot).
+# This is the source of truth: even if someone bypasses the frontend check
+# (e.g. calls /upload directly with curl/Postman), this still applies.
+ALLOWED_EXTENSIONS = {"pdf", "doc", "docx", "txt", "png", "jpg", "jpeg"}
+
+
+def allowed_file(filename: str) -> bool:
+    """
+    Return True if `filename` has an extension in ALLOWED_EXTENSIONS.
+
+    Handles:
+    - Missing extension (e.g. "README") -> False
+    - Uppercase / mixed-case extensions (e.g. "Scan.PDF") -> normalized to lowercase
+    - Hidden/dotfiles with no real extension (e.g. ".gitignore") -> False,
+      since rsplit("." , 1) yields ["", "gitignore"] and the "name" part is empty
+    """
+    if not filename or "." not in filename:
+        return False
+
+    name_part, _, ext = filename.rpartition(".")
+
+    # Reject hidden/system files that have no real name before the dot
+    # (e.g. ".gitignore", ".DS_Store") — rpartition gives name_part == ""
+    if not name_part.strip():
+        return False
+
+    return ext.lower() in ALLOWED_EXTENSIONS
+# -----------------------------------------------------------------------------
+
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 db_pool = None
 
@@ -368,6 +398,14 @@ def upload_file():
 
     if file.filename == "":
         return jsonify({"success": False, "message": "Empty filename"}), 400
+
+    # Server-side extension check (defense in depth — never trust the client).
+    # Must happen before we read/upload the file bytes or touch the DB.
+    if not allowed_file(file.filename):
+        return jsonify({
+            "success": False,
+            "message": "Unsupported file type"
+        }), 400
 
     user_id = session["user_id"]
 
