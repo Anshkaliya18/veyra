@@ -16,8 +16,6 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")      # Service Role Key
 BUCKET = "documents"
 
-
-
 # --- File upload validation -------------------------------------------------
 # Server-side allow-list of accepted file extensions (lowercase, no dot).
 # This is the source of truth: even if someone bypasses the frontend check
