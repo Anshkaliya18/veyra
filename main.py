@@ -143,13 +143,27 @@ def login():
     email = (request.form.get("email") or "").strip().lower()
     password = request.form.get("password") or ""
 
+    # Check if request came from fetch/AJAX
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
     if not email or not password:
-        return render_template("login.html", error="Please enter email and password."), 400
+        if is_ajax:
+            return jsonify({
+                "success": False,
+                "error": "Please enter email and password."
+            }), 400
+
+        return render_template(
+            "login.html",
+            error="Please enter email and password."
+        ), 400
 
     conn = get_db_connection()
     cur = None
+
     try:
         cur = conn.cursor()
+
         cur.execute(
             """
             SELECT id, firstName, lastName, email, password_hash
@@ -158,25 +172,56 @@ def login():
             """,
             (email,),
         )
+
         user = cur.fetchone()
 
         if not user or not check_password_hash(user[4], password):
-            return render_template("login.html", error="Invalid email or password."), 401
+            if is_ajax:
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid email or password."
+                }), 401
 
+            return render_template(
+                "login.html",
+                error="Invalid email or password."
+            ), 401
+
+        # Save session
         session["user_id"] = user[0]
         session["email"] = user[3]
         session["firstName"] = user[1]
         session["lastName"] = user[2]
 
+        # AJAX login
+        if is_ajax:
+            return jsonify({
+                "success": True,
+                "message": "Login successful",
+                "redirect": "/dashboard"
+            })
+
+        # Normal form login
         return redirect("/dashboard")
 
     except Exception as e:
         logger.exception("Login failed")
-        return render_template("login.html", error=f"Login failed: {str(e)}"), 500
+
+        if is_ajax:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+        return render_template(
+            "login.html",
+            error=f"Login failed: {str(e)}"
+        ), 500
 
     finally:
         if cur is not None:
             cur.close()
+
         release_db_connection(conn)
 
 

@@ -34,6 +34,12 @@ document.querySelector("[data-auth]")?.addEventListener("submit", async (e) => {
 
     const data = await response.json();
 
+    if (data.success) {
+    window.location.href = data.redirect;
+    } else {
+        alert(data.error);
+    }
+
     if (!response.ok) {
       throw new Error(data.error || "Login failed");
     }
