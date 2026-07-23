@@ -546,6 +546,9 @@ def delete_user_upload(user_id: int, file_id: int) -> bool:
             "DELETE FROM uploaded_files WHERE id = %s AND user_id = %s",
             (file_id, user_id),
         )
+
+        print(f"Rows deleted: {cur.rowcount}")
+
         conn.commit()
         return True
 

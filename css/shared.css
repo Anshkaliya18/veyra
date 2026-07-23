@@ -2580,3 +2580,88 @@ button { cursor: pointer; font: inherit; }
     transform: translateY(0);
     pointer-events: auto;
 }
+
+/* ===========================
+   File Actions
+=========================== */
+
+.file-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.file-actions a,
+.file-actions button{
+    border:none;
+    outline:none;
+    cursor:pointer;
+    text-decoration:none;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:8px 14px;
+    border-radius:10px;
+
+    font-size:12px;
+    font-weight:600;
+
+    transition:.25s ease;
+}
+
+/* Open */
+
+.file-actions a{
+    color:#7f9cff;
+    background:rgba(127,156,255,.12);
+    border:1px solid rgba(127,156,255,.18);
+}
+
+.file-actions a:hover{
+    background:#7f9cff;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(127,156,255,.25);
+}
+
+/* Delete */
+
+.delete-btn{
+    color:#ff7a7a;
+    background:rgba(255,90,90,.10);
+    border:1px solid rgba(255,90,90,.18);
+}
+
+.delete-btn:hover{
+    background:#ff4f4f;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(255,79,79,.25);
+}
+
+/* Click animation */
+
+.file-actions button:active,
+.file-actions a:active{
+    transform:scale(.96);
+}
+
+/* Responsive */
+
+@media (max-width:700px){
+
+    .file-actions{
+        flex-direction:column;
+        align-items:stretch;
+        width:100%;
+    }
+
+    .file-actions a,
+    .file-actions button{
+        width:100%;
+    }
+
+}

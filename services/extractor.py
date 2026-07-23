@@ -163,31 +163,54 @@ def _clean_text(text: str) -> str:
         cleaned = cleaned.replace("\n\n\n", "\n\n")
     return cleaned.strip()
 
-
 def _extract_pdf(path: Path) -> tuple[str, int]:
     if fitz is None:
         raise ExtractionError(
             "PyMuPDF is not installed. Run: pip install pymupdf"
         )
 
-    pages_text: list[str] = []
+    if Image is None:
+        raise ExtractionError(
+            "Pillow is not installed. Run: pip install pillow"
+        )
+
+    if pytesseract is None:
+        raise ExtractionError(
+            "pytesseract is not installed. Run: pip install pytesseract"
+        )
+
+    pages_text = []
     pages_count = 0
 
     with fitz.open(str(path)) as pdf:
         pages_count = len(pdf)
+
         for page in pdf:
-            page_text = page.get_text("text") or ""
-            page_text = page_text.strip()
+
+            # Try extracting embedded PDF text first
+            page_text = page.get_text("text").strip()
+
+            # If no text exists, use OCR
+            if not page_text:
+
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+
+                img = Image.frombytes(
+                    "RGB",
+                    [pix.width, pix.height],
+                    pix.samples
+                )
+
+                page_text = pytesseract.image_to_string(img)
+
+            page_text = _clean_text(page_text)
+
             if page_text:
                 pages_text.append(page_text)
 
     text = "\n\n".join(pages_text)
-    text = _clean_text(text)
 
-    # If the PDF is scanned, text may be nearly empty.
-    # Keep the extracted output; OCR can be added later if needed.
     return text, pages_count
-
 
 def _extract_docx(path: Path) -> str:
     if Document is None:
@@ -263,3 +286,4 @@ def _extract_image(path: Path) -> str:
         return _clean_text(text)
     except Exception as exc:
         raise ExtractionError(f"OCR failed: {exc}") from exc
+    

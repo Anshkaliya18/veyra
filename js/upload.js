@@ -1,8 +1,14 @@
-console.log("upload.js loaded");
+function $(selector, root = document) {
+  return root.querySelector(selector);
+}
 
-const zone = document.querySelector("#dropzone");
-const input = document.querySelector("#file-input");
-const list = document.querySelector("#file-list");
+function $all(selector, root = document) {
+  return Array.from(root.querySelectorAll(selector));
+}
+
+const zone = $("#dropzone");
+const input = $("#file-input");
+const list = $("#file-list");
 
 const ALLOWED_EXTENSIONS = [
   "pdf",
@@ -45,7 +51,7 @@ function partitionFiles(files) {
 }
 
 function showUploadError(message) {
-  let toast = document.querySelector("#upload-toast");
+  let toast = $("#upload-toast");
 
   if (!toast) {
     toast = document.createElement("div");
@@ -71,90 +77,193 @@ function iconFor(file) {
   return file.name.split(".").pop().slice(0, 3).toUpperCase();
 }
 
-function addFiles(files) {
-  [...files].forEach((file, index) => {
-    const row = document.createElement("div");
-    row.className = "file-row";
-    row.innerHTML = `
+function formatFileSize(bytes) {
+  if (!bytes || Number.isNaN(bytes)) return "Unknown size";
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
+function formatDate(value) {
+  if (!value) return "Recently";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return date.toLocaleString();
+}
+
+function safeText(value, fallback = "") {
+  return value == null || value === "" ? fallback : String(value);
+}
+
+function createFileRowFromUpload(file) {
+  const row = document.createElement("div");
+  row.className = "file-row";
+  row.dataset.tempRow = "true";
+
+  row.innerHTML = `
+    <div class="file-main">
+      <span class="file-icon">${iconFor(file)}</span>
+      <div>
+        <b>${safeText(file.name, "Unnamed file")}</b>
+        <span>${formatFileSize(file.size)} · Just now</span>
+      </div>
+    </div>
+    <span class="badge">Analyzing</span>
+    <div class="progress-line"><i style="--p:8%"></i></div>
+    <span class="status">8%</span>
+  `;
+
+  return row;
+}
+
+function createFileRowFromDb(file) {
+  const ext = (safeText(file.original_filename, "FILE"))
+    .split(".")
+    .pop()
+    .slice(0, 3)
+    .toUpperCase();
+
+  const row = document.createElement("div");
+  row.className = "file-row";
+  row.dataset.fileId = safeText(file.id, "");
+
+  row.innerHTML = `
+    <div class="file-main">
+      <span class="file-icon">${ext}</span>
+      <div>
+        <b>${safeText(file.original_filename, "Unnamed file")}</b>
+        <span>${formatFileSize(file.file_size)} · ${formatDate(file.created_at)}</span>
+      </div>
+    </div>
+
+    <span class="badge">${safeText(file.upload_status, "uploaded")}</span>
+
+    <div class="progress-line"><i style="--p:100%"></i></div>
+
+    <span class="status">✓ Ready</span>
+
+    <div class="file-actions">
+      <a href="${safeText(file.file_url, "#")}" target="_blank" rel="noopener noreferrer">
+        Open
+      </a>
+      <button type="button" class="delete-btn" data-delete-file-id="${safeText(file.id, "")}">
+        Delete
+      </button>
+    </div>
+  `;
+
+  return row;
+}
+
+function ensureFileListEmptyState(container) {
+  container.innerHTML = `
+    <div class="file-row">
       <div class="file-main">
-        <span class="file-icon">${iconFor(file)}</span>
+        <span class="file-icon">---</span>
         <div>
-          <b>${file.name}</b>
-          <span>${(file.size / 1024 / 1024).toFixed(1)} MB · Just now</span>
+          <b>No uploaded files found</b>
+          <span>Upload a document to see it here</span>
         </div>
       </div>
-      <span class="badge">Analyzing</span>
-      <div class="progress-line"><i style="--p:8%"></i></div>
-      <span class="status">8%</span>
-    `;
+      <span class="badge">Empty</span>
+      <div class="progress-line"><i style="--p:0%"></i></div>
+      <span class="status">—</span>
+    </div>
+  `;
+}
 
-    list.prepend(row);
+function getFilesFromApiResponse(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.files)) return data.files;
+  return [];
+}
 
-    const bar = row.querySelector("i");
-    const status = row.querySelector(".status");
-    let p = 8;
+function setRowStatus(row, { badge, status, progress }) {
+  const badgeEl = row.querySelector(".badge");
+  const statusEl = row.querySelector(".status");
+  const progressEl = row.querySelector(".progress-line i");
 
-    const timer = setInterval(() => {
-      p = Math.min(p + Math.ceil(Math.random() * 14), 100);
-      bar.style.setProperty("--p", p + "%");
-      status.textContent = p < 100 ? p + "%" : "✓ Ready";
-
-      if (p === 100) {
-        row.querySelector(".badge").textContent = "Understood";
-        clearInterval(timer);
-      }
-    }, 170 + index * 50);
-  });
+  if (badgeEl && badge) badgeEl.textContent = badge;
+  if (statusEl && status) statusEl.textContent = status;
+  if (progressEl && progress) progressEl.style.setProperty("--p", progress);
 }
 
 async function uploadFiles(files) {
-  console.log("uploadFiles called");
-  const rows = document.querySelectorAll("#file-list .file-row");
+  const rows = $all("#file-list .file-row").filter(
+    (row) => row.dataset.tempRow === "true"
+  );
 
   for (let index = 0; index < files.length; index++) {
     const file = files[index];
     const row = rows[index];
-
     if (!row) continue;
 
-    const badge = row.querySelector(".badge");
-    const status = row.querySelector(".status");
-    const progress = row.querySelector(".progress-line i");
-
-    badge.textContent = "Uploading";
-    status.innerHTML = `<span class="spinner"></span> Uploading...`;
-    progress.style.setProperty("--p", "25%");
+    setRowStatus(row, {
+      badge: "Uploading",
+      status: "Uploading...",
+      progress: "25%",
+    });
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      console.log("Sending request...");
       const response = await fetch("/upload", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
-      console.log("Response:", data);
 
       if (!response.ok || !data.success) {
-        badge.textContent = "Failed";
-        status.textContent = "✗ Failed";
+        setRowStatus(row, {
+          badge: "Failed",
+          status: "✗ Failed",
+          progress: "100%",
+        });
         continue;
       }
 
-      badge.textContent = "Uploaded";
-      status.textContent = "✓ Ready";
-      progress.style.setProperty("--p", "100%");
+      setRowStatus(row, {
+        badge: "Uploaded",
+        status: "✓ Ready",
+        progress: "100%",
+      });
+
+      row.dataset.tempRow = "done";
     } catch (err) {
-      console.error(err);
-      badge.textContent = "Failed";
-      status.textContent = "✗ Failed";
+      console.error("Upload failed:", err);
+      setRowStatus(row, {
+        badge: "Failed",
+        status: "✗ Failed",
+        progress: "100%",
+      });
     }
   }
 
   await loadFiles();
+}
+
+async function deleteFile(fileId) {
+  if (!fileId) return;
+  if (!confirm("Delete this file?")) return;
+
+  try {
+    const response = await fetch(`/delete-file/${fileId}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      await loadFiles();
+    } else {
+      alert(data.message || "Delete failed.");
+    }
+  } catch (err) {
+    console.error("Delete failed:", err);
+    alert("Delete failed.");
+  }
 }
 
 async function loadFiles() {
@@ -172,13 +281,9 @@ async function loadFiles() {
       throw new Error(data.message || "Failed to load files");
     }
 
-    const files = Array.isArray(data)
-      ? data
-      : Array.isArray(data.files)
-      ? data.files
-      : [];
+    const files = getFilesFromApiResponse(data);
+    const container = $("#file-list");
 
-    const container = document.getElementById("file-list");
     if (!container) {
       console.error("file-list container not found");
       return;
@@ -187,57 +292,12 @@ async function loadFiles() {
     container.innerHTML = "";
 
     if (files.length === 0) {
-      container.innerHTML = `
-        <div class="file-row">
-          <div class="file-main">
-            <span class="file-icon">---</span>
-            <div>
-              <b>No uploaded files found</b>
-              <span>Upload a document to see it here</span>
-            </div>
-          </div>
-          <span class="badge">Empty</span>
-          <div class="progress-line"><i style="--p:0%"></i></div>
-          <span class="status">—</span>
-        </div>
-      `;
+      ensureFileListEmptyState(container);
       return;
     }
 
     files.forEach((file) => {
-      const ext = (file.original_filename || "FILE")
-        .split(".")
-        .pop()
-        .slice(0, 3)
-        .toUpperCase();
-
-      const sizeText = file.file_size
-        ? `${(file.file_size / 1024).toFixed(1)} KB`
-        : "Unknown size";
-
-      const createdText = file.created_at
-        ? new Date(file.created_at).toLocaleString()
-        : "Recently";
-
-      const row = document.createElement("div");
-      row.className = "file-row";
-      row.innerHTML = `
-        <div class="file-main">
-          <span class="file-icon">${ext}</span>
-          <div>
-            <b>${file.original_filename || "Unnamed file"}</b>
-            <span>${sizeText} · ${createdText}</span>
-          </div>
-        </div>
-        <span class="badge">${file.upload_status || "uploaded"}</span>
-        <div class="progress-line"><i style="--p:100%"></i></div>
-        <span class="status">✓ Ready</span>
-        <div class="file-actions">
-          <a href="${file.file_url}" target="_blank" rel="noopener noreferrer">Open</a>
-        </div>
-      `;
-
-      container.appendChild(row);
+      container.appendChild(createFileRowFromDb(file));
     });
   } catch (error) {
     console.error("Load Files Error:", error);
@@ -252,7 +312,11 @@ input?.addEventListener("change", async (e) => {
   }
 
   if (valid.length > 0) {
-    addFiles(valid);
+    // Add optimistic rows first so the user sees immediate feedback
+    valid.forEach((file) => {
+      list?.prepend(createFileRowFromUpload(file));
+    });
+
     await uploadFiles(valid);
   }
 
@@ -283,17 +347,28 @@ zone?.addEventListener("drop", async (e) => {
   }
 
   if (valid.length > 0) {
-    addFiles(valid);
+    valid.forEach((file) => {
+      list?.prepend(createFileRowFromUpload(file));
+    });
+
     await uploadFiles(valid);
   }
 });
 
-document.querySelector("#clear-files")?.addEventListener("click", () => {
-  document.querySelectorAll("#file-list .file-row").forEach((row) => {
+$("#clear-files")?.addEventListener("click", () => {
+  $all("#file-list .file-row").forEach((row) => {
     if (row.querySelector(".status")?.textContent.includes("Ready")) {
       row.style.opacity = ".25";
     }
   });
+});
+
+$("#file-list")?.addEventListener("click", async (e) => {
+  const deleteButton = e.target.closest("[data-delete-file-id]");
+  if (!deleteButton) return;
+
+  const fileId = deleteButton.dataset.deleteFileId;
+  await deleteFile(fileId);
 });
 
 document.addEventListener("DOMContentLoaded", () => {
