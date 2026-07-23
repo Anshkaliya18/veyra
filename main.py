@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from functools import wraps
+from datetime import datetime
 
 import tempfile
 from pathlib import Path
@@ -231,12 +232,34 @@ def logout():
     return redirect("/")
 
 
+from datetime import datetime
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
     user = get_logged_in_user()
-    return render_template("dashboard.html", user=user)
 
+    now = datetime.now()
+    hour = now.hour
+
+    if 5 <= hour < 12:
+        greeting = "Good Morning"
+    elif 12 <= hour < 17:
+        greeting = "Good Afternoon"
+    elif 17 <= hour < 21:
+        greeting = "Good Evening"
+    else:
+        greeting = "Good Night"
+
+    current_date = now.strftime("%A, %d %B %Y")
+    # Example: Wednesday, 22 July 2026
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+        greeting=greeting,
+        current_date=current_date
+    )
 
 @app.route("/profile")
 @login_required
@@ -371,6 +394,9 @@ def delete_file(file_id: int):
             "error": str(e)
         }), 500
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
 
 @app.errorhandler(413)
 def request_entity_too_large(_):
