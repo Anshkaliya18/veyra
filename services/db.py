@@ -58,10 +58,54 @@ if DB_TYPE == "postgres":
 SQLITE_PATH = os.getenv("SQLITE_PATH", "veyra.db").strip()
 
 
+class _SQLiteCursorCompat:
+    """
+    Wraps a sqlite3 cursor so it accepts psycopg2-style '%s' placeholders,
+    since the rest of the codebase (main.py, services/*.py) is written
+    using '%s' for PostgreSQL. SQLite itself expects '?' placeholders.
+    """
+
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    @staticmethod
+    def _to_qmark(query: str) -> str:
+        return query.replace("%s", "?")
+
+    def execute(self, query, params=None):
+        query = self._to_qmark(query)
+        if params is None:
+            return self._cursor.execute(query)
+        return self._cursor.execute(query, params)
+
+    def executemany(self, query, seq_of_params):
+        query = self._to_qmark(query)
+        return self._cursor.executemany(query, seq_of_params)
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+
+class _SQLiteConnectionCompat:
+    """Wraps a sqlite3 connection so .cursor() returns a %s-compatible cursor."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self, *args, **kwargs):
+        return _SQLiteCursorCompat(self._conn.cursor(*args, **kwargs))
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+
 def _get_sqlite_connection():
     conn = sqlite3.connect(SQLITE_PATH)
     conn.row_factory = sqlite3.Row
-    return conn
+    return _SQLiteConnectionCompat(conn)
 
 
 # ---------------------------------------------------------------------
@@ -128,12 +172,8 @@ def db_cursor():
 
 def init_db():
     """
-    Create only the minimal tables needed for the new upload-first pipeline.
-
-    IMPORTANT:
-    - This does NOT recreate your old document/AI tables.
-    - It only ensures `users` exists if you are starting fresh locally,
-      and creates `uploaded_files` for the upload pipeline.
+    Create the tables needed for the app: `users` (auth) and
+    `uploaded_files` (upload pipeline).
     """
     conn = get_db_connection()
     cur = None
@@ -141,6 +181,19 @@ def init_db():
         cur = conn.cursor()
 
         if DB_TYPE == "postgres":
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    firstName TEXT NOT NULL,
+                    lastName TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
             cur.execute(
                 """
                 CREATE TABLE IF NOT EXISTS uploaded_files (
@@ -168,6 +221,19 @@ def init_db():
             )
 
         else:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    firstName TEXT NOT NULL,
+                    lastName TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
             cur.execute(
                 """
                 CREATE TABLE IF NOT EXISTS uploaded_files (

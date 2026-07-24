@@ -70,51 +70,113 @@ def home():
     user = get_logged_in_user()
     return render_template("index.html", user=user)
 
-
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "GET":
-        return render_template("signup.html", error=None)
+        return render_template("register.html", error=None)
 
-    first_name = (
-        request.form.get("firstName")
-        or request.form.get("first_name")
-        or request.form.get("firstname")
-        or ""
-    ).strip()
+    # Detect JSON request
+    is_json = request.is_json
 
-    last_name = (
-        request.form.get("lastName")
-        or request.form.get("last_name")
-        or request.form.get("lastname")
-        or ""
-    ).strip()
+    if is_json:
+        data = request.get_json(silent=True) or {}
 
-    email = (request.form.get("email") or "").strip().lower()
-    password = request.form.get("password") or ""
+        first_name = (
+            data.get("firstName")
+            or data.get("first_name")
+            or data.get("firstname")
+            or ""
+        ).strip()
 
-    if not first_name or not last_name or not email or not password:
-        return render_template("signup.html", error="Please fill all required fields."), 400
+        last_name = (
+            data.get("lastName")
+            or data.get("last_name")
+            or data.get("lastname")
+            or ""
+        ).strip()
+
+        email = (data.get("email") or "").strip().lower()
+        password = data.get("password") or ""
+
+    else:
+        first_name = (
+            request.form.get("firstName")
+            or request.form.get("first_name")
+            or request.form.get("firstname")
+            or ""
+        ).strip()
+
+        last_name = (
+            request.form.get("lastName")
+            or request.form.get("last_name")
+            or request.form.get("lastname")
+            or ""
+        ).strip()
+
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+
+    print("Content-Type:", request.content_type)
+    print("First Name:", first_name)
+    print("Last Name:", last_name)
+    print("Email:", email)
+
+    if not first_name or not email or not password:
+        message = "Please fill all required fields."
+
+        if is_json:
+            return jsonify({
+                "success": False,
+                "message": message
+            }), 400
+
+        return render_template(
+            "register.html",
+            error=message
+        ), 400
 
     conn = get_db_connection()
     cur = None
+
     try:
         cur = conn.cursor()
 
-        cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+        cur.execute(
+            "SELECT id FROM users WHERE email = %s",
+            (email,)
+        )
+
         if cur.fetchone():
-            return render_template("signup.html", error="Email already exists."), 400
+            message = "Email already exists."
+
+            if is_json:
+                return jsonify({
+                    "success": False,
+                    "message": message
+                }), 400
+
+            return render_template(
+                "register.html",
+                error=message
+            ), 400
 
         password_hash = generate_password_hash(password)
 
         cur.execute(
             """
-            INSERT INTO users (firstName, lastName, email, password_hash)
+            INSERT INTO users
+            (firstName, lastName, email, password_hash)
             VALUES (%s, %s, %s, %s)
             RETURNING id
             """,
-            (first_name, last_name, email, password_hash),
+            (
+                first_name,
+                last_name,
+                email,
+                password_hash,
+            ),
         )
+
         user_id = cur.fetchone()[0]
         conn.commit()
 
@@ -123,18 +185,33 @@ def signup():
         session["firstName"] = first_name
         session["lastName"] = last_name
 
+        if is_json:
+            return jsonify({
+                "success": True,
+                "redirect": "/dashboard"
+            })
+
         return redirect("/dashboard")
 
     except Exception as e:
         conn.rollback()
         logger.exception("Signup failed")
-        return render_template("signup.html", error=f"Signup failed: {str(e)}"), 500
+
+        if is_json:
+            return jsonify({
+                "success": False,
+                "message": str(e)
+            }), 500
+
+        return render_template(
+            "register.html",
+            error=f"Signup failed: {e}"
+        ), 500
 
     finally:
-        if cur is not None:
+        if cur:
             cur.close()
         release_db_connection(conn)
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
