@@ -972,3 +972,11 @@ def ai_search(
 
 def search_documents(user_id: int, query: str, limit: int = MAX_CONTEXT_DOCS) -> dict[str, Any]:
     return ai_search(user_id=user_id, query=query, limit=limit)
+
+def list_user_documents(user_id: int) -> dict[str, Any]:
+    docs = fetch_user_documents(user_id, limit=MAX_CANDIDATE_DOCS)
+    return {
+        "success": True,
+        "count": len(docs),
+        "documents": [doc.to_dict() for doc in docs],
+    }

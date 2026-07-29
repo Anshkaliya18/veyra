@@ -589,6 +589,13 @@ def api_search():
             "error": str(e)
         }), 500
 
+@app.route("/api/search/documents", methods=["GET"])
+@login_required
+def api_search_documents():
+    from services.search import list_user_documents
+
+    return jsonify(list_user_documents(session["user_id"]))
+
 @app.route("/delete-file/<int:file_id>", methods=["DELETE"])
 def delete_file(file_id: int):
     if "user_id" not in session:
