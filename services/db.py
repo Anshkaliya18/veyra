@@ -1,0 +1,316 @@
+# services/db.py
+from __future__ import annotations
+
+import os
+import sqlite3
+import logging
+from contextlib import contextmanager
+from typing import Optional, Union
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+DB_TYPE = os.getenv("DB_TYPE", "").strip().lower()
+
+# If DB_TYPE is not set, infer it from DATABASE_URL
+if not DB_TYPE:
+    if DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://"):
+        DB_TYPE = "postgres"
+    else:
+        DB_TYPE = "sqlite"
+
+# ---------------------------------------------------------------------
+# PostgreSQL pool
+# ---------------------------------------------------------------------
+_pg_pool = None
+
+if DB_TYPE == "postgres":
+    try:
+        from psycopg2.pool import SimpleConnectionPool
+    except Exception as exc:
+        raise RuntimeError(
+            "psycopg2 is required for PostgreSQL. Install it with: pip install psycopg2-binary"
+        ) from exc
+
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL is missing for PostgreSQL")
+
+    # Lazy-created pool so the app can import cleanly.
+    def _get_pg_pool():
+        global _pg_pool
+        if _pg_pool is None:
+            _pg_pool = SimpleConnectionPool(
+                minconn=1,
+                maxconn=10,
+                dsn=DATABASE_URL,
+            )
+        return _pg_pool
+
+
+# ---------------------------------------------------------------------
+# SQLite fallback (optional, useful for local dev)
+# ---------------------------------------------------------------------
+SQLITE_PATH = os.getenv("SQLITE_PATH", "veyra.db").strip()
+
+
+class _SQLiteCursorCompat:
+    """
+    Wraps a sqlite3 cursor so it accepts psycopg2-style '%s' placeholders,
+    since the rest of the codebase (main.py, services/*.py) is written
+    using '%s' for PostgreSQL. SQLite itself expects '?' placeholders.
+    """
+
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    @staticmethod
+    def _to_qmark(query: str) -> str:
+        return query.replace("%s", "?")
+
+    def execute(self, query, params=None):
+        query = self._to_qmark(query)
+        if params is None:
+            return self._cursor.execute(query)
+        return self._cursor.execute(query, params)
+
+    def executemany(self, query, seq_of_params):
+        query = self._to_qmark(query)
+        return self._cursor.executemany(query, seq_of_params)
+
+    def __getattr__(self, name):
+        return getattr(self._cursor, name)
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+
+class _SQLiteConnectionCompat:
+    """Wraps a sqlite3 connection so .cursor() returns a %s-compatible cursor."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self, *args, **kwargs):
+        return _SQLiteCursorCompat(self._conn.cursor(*args, **kwargs))
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+
+def _get_sqlite_connection():
+    conn = sqlite3.connect(SQLITE_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        conn.execute("PRAGMA foreign_keys = ON")
+    except Exception:
+        pass
+    return _SQLiteConnectionCompat(conn)
+
+
+# ---------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------
+def get_db_connection():
+    """
+    Returns a database connection for either PostgreSQL or SQLite.
+    PostgreSQL is preferred for Render deployment.
+    """
+    if DB_TYPE == "postgres":
+        pool = _get_pg_pool()
+        conn = pool.getconn()
+        return conn
+
+    return _get_sqlite_connection()
+
+def release_db_connection(conn) -> None:
+    """
+    Returns a PostgreSQL connection back to the pool.
+    Closes SQLite connections.
+    """
+    if conn is None:
+        return
+
+    if DB_TYPE == "postgres":
+        try:
+            pool = _get_pg_pool()
+            pool.putconn(conn)
+        except Exception:
+            logger.exception("Failed to release PostgreSQL connection")
+    else:
+        try:
+            conn.close()
+        except Exception:
+            logger.exception("Failed to close SQLite connection")
+
+
+@contextmanager
+def db_cursor():
+    """
+    Optional helper:
+        with db_cursor() as cur:
+            cur.execute(...)
+    """
+    conn = get_db_connection()
+    cur = None
+    try:
+        cur = conn.cursor()
+        yield cur
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        if cur is not None:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        release_db_connection(conn)
+
+
+def init_db():
+    """
+    Create the tables needed for the app: `users` (auth) and
+    `uploaded_files` (upload pipeline).
+    """
+    conn = get_db_connection()
+    cur = None
+    try:
+        cur = conn.cursor()
+
+        if DB_TYPE == "postgres":
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    firstName TEXT NOT NULL,
+                    lastName TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS uploaded_files (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    original_filename TEXT NOT NULL,
+                    stored_filename TEXT NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    file_url TEXT NOT NULL,
+                    content_type TEXT,
+                    file_size BIGINT,
+                    upload_status TEXT DEFAULT 'uploaded',
+                    error_message TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_uploaded_files_user_id
+                ON uploaded_files(user_id)
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS documents (
+                    id SERIAL PRIMARY KEY,
+                    uploaded_file_id INTEGER NOT NULL REFERENCES uploaded_files(id) ON DELETE CASCADE,
+                    raw_text TEXT DEFAULT '',
+                    summary TEXT DEFAULT '',
+                    keywords TEXT,
+                    entities TEXT,
+                    metadata TEXT,
+                    language TEXT DEFAULT '',
+                    extraction_status TEXT DEFAULT 'pending',
+                    summary_status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(uploaded_file_id)
+                )
+                """
+            )
+
+        else:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    firstName TEXT NOT NULL,
+                    lastName TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS uploaded_files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    original_filename TEXT NOT NULL,
+                    stored_filename TEXT NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    file_url TEXT NOT NULL,
+                    content_type TEXT,
+                    file_size INTEGER,
+                    upload_status TEXT DEFAULT 'uploaded',
+                    error_message TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_uploaded_files_user_id
+                ON uploaded_files(user_id)
+                """
+            )
+
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS documents (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    uploaded_file_id INTEGER NOT NULL UNIQUE,
+                    raw_text TEXT DEFAULT '',
+                    summary TEXT DEFAULT '',
+                    keywords TEXT,
+                    entities TEXT,
+                    metadata TEXT,
+                    language TEXT DEFAULT '',
+                    extraction_status TEXT DEFAULT 'pending',
+                    summary_status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(uploaded_file_id) REFERENCES uploaded_files(id) ON DELETE CASCADE
+                )
+                """
+            )
+
+        conn.commit()
+        logger.info("Database initialized successfully")
+
+    except Exception:
+        conn.rollback()
+        logger.exception("Failed to initialize database")
+        raise
+
+    finally:
+        if cur is not None:
+            cur.close()
+        release_db_connection(conn)

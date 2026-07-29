@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Veyra-web</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="9603f84b-8dbd-417b-9738-c52d25aa1d18"></script>
+    <link rel="stylesheet" href="css/timeline.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><i class="brand-mark"></i
+          ><span class="brand-name">ve<span>y</span>ra</span></a
+        >
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"
+              ><span class="side-icon">◈</span>Overview</a
+            ><a class="side-link" href="/upload"
+              ><span class="side-icon">↑</span>Upload</a
+            ><a class="side-link" href="/search"
+              ><span class="side-icon">⌕</span>AI Search</a
+            >
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link active" href="/timeline"
+              ><span class="side-icon">⌁</span>Timeline</a
+            ><a class="side-link" href="/profile"
+              ><span class="side-icon">◉</span>Profile</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile"
+            ><span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div><b>{{ user[1] }} {{ user[2] }}</b><span>Identity workspace</span></div></a
+          >
+        </div>
+      </aside>
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Identity / <b>Timeline</b></span>
+          <div class="top-tools">
+            <button class="round-icon">↗</button
+            ><a class="btn btn-primary btn-small" href="/upload"
+              >Add a moment <span>+</span></a
+            >
+          </div>
+        </header>
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">Your journey, illuminated</p>
+            <h1>The story behind your work.</h1>
+            <p>
+              A living sequence of every meaningful milestone Veyra has
+              understood.
+            </p>
+          </div>
+          <span class="badge" id="timelineStats">
+              Loading timeline...
+          </span>
+        </section>
+        <section class="timeline-toolbar">
+
+            <input
+                type="text"
+                id="timelineSearch"
+                class="timeline-search"
+                placeholder="Search milestones..."
+            >
+
+            <select
+                id="timelineFilter"
+                class="timeline-filter"
+            >
+                <option value="">All Categories</option>
+                <option value="Education">Education</option>
+                <option value="Experience">Experience</option>
+                <option value="Project">Project</option>
+                <option value="Achievement">Achievement</option>
+                <option value="Credential">Credential</option>
+                <option value="Research">Research</option>
+                <option value="Skill">Skill</option>
+            </select>
+
+        </section>
+        <section class="timeline-wrap" id="timelineContainer">
+            <div class="loading">
+                Loading timeline...
+            </div>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/timeline.js"></script>
+  </body>
+</html>

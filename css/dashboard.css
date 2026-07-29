@@ -1,0 +1,121 @@
+
+@import url("shared.css");
+
+/* dashboard-specific refinements */
+.dashboard-grid {
+  align-items: start;
+}
+
+.wide-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-area {
+  height: 250px;
+  margin-top: 18px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(139, 124, 255, 0.16), transparent 30%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 46px,
+      rgba(255, 255, 255, 0.05) 47px
+    );
+}
+
+.chart-labels {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  color: #737891;
+  font: 10px "DM Mono", monospace;
+}
+
+.activity-list {
+  margin-top: 10px;
+}
+
+.activity {
+  display: flex;
+  gap: 11px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  align-items: flex-start;
+}
+
+.activity:last-child {
+  border-bottom: 0;
+}
+
+.activity-body {
+  min-width: 0;
+}
+
+.activity-body b {
+  font-size: 11px;
+  display: block;
+  line-height: 1.35;
+  margin-bottom: 3px;
+}
+
+.activity-body span {
+  color: var(--muted);
+  font-size: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.activity time {
+  margin-left: auto;
+  color: #777d95;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: 14px 0 6px;
+}
+.empty-state b {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.empty-state span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.skill-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.skill {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(135, 117, 255, 0.12);
+  border: 1px solid rgba(138, 124, 255, 0.18);
+  color: #c9c1ff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.muted-skill {
+  color: #8d93a9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.journey {
+  margin: 17px 0 0;
+  padding-left: 13px;
+  border-left: 1px solid rgba(88, 224, 208, 0.45);
+}

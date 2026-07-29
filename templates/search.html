@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Veyra-web</title>
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="9603f84b-8dbd-417b-9738-c52d25aa1d18"
+    ></script>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+    <link rel="stylesheet" href="css/search.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/">
+          <i class="brand-mark"></i>
+          <span class="brand-name">ve<span>y</span>ra</span>
+        </a>
+
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard">
+              <span class="side-icon">◈</span>Overview
+            </a>
+            <a class="side-link" href="/upload">
+              <span class="side-icon">↑</span>Upload
+            </a>
+            <a class="side-link active" href="/search">
+              <span class="side-icon">⌕</span>AI Search
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline">
+              <span class="side-icon">⌁</span>Timeline
+            </a>
+            <a class="side-link" href="/profile">
+              <span class="side-icon">◉</span>Profile
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile">
+            <span class="avatar">{{ user[1][0] }}{{ user[2][0] }}</span>
+            <div>
+              <b>{{ user[1] }} {{ user[2] }}</b>
+              <span>Identity workspace</span>
+            </div>
+          </a>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>AI search</b></span>
+          <div class="top-tools">
+            <span class="badge"><i class="dot"></i> Veyra AI online</span>
+            <button class="round-icon" type="button">♧</button>
+          </div>
+        </header>
+
+        <section class="search-hero">
+          <p class="eyebrow">Ask your story anything</p>
+          <h1>Find the signal in your journey.</h1>
+          <p class="muted" style="font-size: 12px; margin: 0 0 18px">
+            Search by meaning — not just by words or filenames.
+          </p>
+
+          <form class="search-field" id="search-form">
+            <span>⌕</span>
+            <input
+              id="search-input"
+              autofocus
+              value="Show me everything related to machine learning"
+              aria-label="Search your identity"
+            />
+            <button class="btn btn-primary btn-small" type="submit">
+              Ask Veyra <span>→</span>
+            </button>
+          </form>
+
+          <div class="suggestions">
+            <button class="suggestion" type="button">My latest certificates</button>
+            <button class="suggestion" type="button">Projects using Python</button>
+            <button class="suggestion" type="button">Show internship experience</button>
+            <button class="suggestion" type="button">What are my strongest skills?</button>
+          </div>
+        </section>
+
+        <section class="search-layout">
+          <aside class="app-card filters">
+            <p class="kicker">Filter results</p>
+
+            <div class="filter-group">
+              <b class="filter-title">TYPE</b>
+              <label class="filter-option">
+                <input type="checkbox" checked data-filter="all" /> All sources
+                <span style="margin-left: auto" data-filter-count="all">0</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" data-filter="documents" /> Documents
+                <span style="margin-left: auto" data-filter-count="documents">0</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" data-filter="projects" /> Projects
+                <span style="margin-left: auto" data-filter-count="projects">0</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" data-filter="credentials" /> Credentials
+                <span style="margin-left: auto" data-filter-count="credentials">0</span>
+              </label>
+            </div>
+          </aside>
+
+          <div>
+            <div class="results-head">
+              <span id="results-copy">Veyra found 0 connected results</span>
+              <span>Sorted by relevance ↓</span>
+            </div>
+
+            <div id="search-results"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/search.js"></script>
+  </body>
+</html>

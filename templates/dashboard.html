@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Veyra • Dashboard</title>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="9603f84b-8dbd-417b-9738-c52d25aa1d18"></script>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"><i class="brand-mark"></i><span class="brand-name">ve<span>y</span>ra</span></a>
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link active" href="/dashboard"><span class="side-icon">◈</span>Overview</a>
+            <a class="side-link" href="/upload"><span class="side-icon">↑</span>Upload</a>
+            <a class="side-link" href="/search"><span class="side-icon">⌕</span>AI Search</a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"><span class="side-icon">⌁</span>Timeline</a>
+            <a class="side-link" href="/profile"><span class="side-icon">◉</span>Profile</a>
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile">
+            <span class="avatar">{{ (user[1] or 'U')[:1] }}{{ (user[2] or 'X')[:1] }}</span>
+            <div>
+              <b>{{ user[1] or 'Unknown User' }} {{ user[2] or '' }}</b>
+              <span>Identity workspace</span>
+            </div>
+          </a>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Workspace / <b>Overview</b></span>
+          <div class="top-tools">
+            <button class="round-icon" type="button">⌕</button>
+            <button class="round-icon" type="button">♧</button>
+            <a class="btn btn-primary btn-small" href="/upload">Upload <span>↑</span></a>
+          </div>
+        </header>
+
+        <section class="page-intro">
+          <div>
+            <p class="eyebrow">{{ current_date }}</p>
+            <h1>{{ greeting }}, {{ user[1] or 'there' }}.</h1>
+            <p>Here’s how your professional story is taking shape.</p>
+          </div>
+          <span class="badge"><i class="dot"></i> Identity health: Excellent</span>
+        </section>
+
+        <section class="stat-grid">
+          <article class="app-card stat-card reveal" style="--glow: #806bff">
+            <span class="stat-icon">▤</span>
+            <div class="stat-value">{{ stats.documents }}</div>
+            <div class="stat-label">Documents understood</div>
+            <div class="stat-trend">↗ Live from DB</div>
+          </article>
+
+          <article class="app-card stat-card reveal" style="--glow: #55ddcf">
+            <span class="stat-icon">✦</span>
+            <div class="stat-value">{{ stats.skills }}</div>
+            <div class="stat-label">Verified skills</div>
+            <div class="stat-trend">↗ Auto extracted</div>
+          </article>
+
+          <article class="app-card stat-card reveal" style="--glow: #ff83bd">
+            <span class="stat-icon">⌁</span>
+            <div class="stat-value">{{ stats.milestones }}</div>
+            <div class="stat-label">Journey milestones</div>
+            <div class="stat-trend">↗ From documents</div>
+          </article>
+
+          <article class="app-card stat-card reveal" style="--glow: #ffca7a">
+            <span class="stat-icon">◌</span>
+            <div class="stat-value">{{ stats.completeness }}<span style="font-size:16px">%</span></div>
+            <div class="stat-label">Identity completeness</div>
+            <div class="stat-trend">↗ Updated live</div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid app-section">
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Recent understanding</h2>
+                <p class="card-sub">Veyra found new context</p>
+              </div>
+              <a href="/upload" class="kicker">View all</a>
+            </div>
+
+            <div class="activity-list">
+              {% if recent_docs %}
+                {% for doc in recent_docs %}
+                <div class="activity">
+                  <span class="file-icon">PDF</span>
+                  <div class="activity-body">
+                    <b>{{ doc.name }}</b>
+                    <span>{{ doc.summary or "Processed successfully" }}</span>
+                  </div>
+                  <time>{{ doc.time }}</time>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="empty-state">
+                  <b>No documents yet</b>
+                  <span>Upload a file to see extracted context here.</span>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid app-section">
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Skills in your orbit</h2>
+                <p class="card-sub">Extracted with high confidence</p>
+              </div>
+              <a href="/profile" class="kicker">Profile ↗</a>
+            </div>
+
+            <div class="skill-cloud">
+              {% if skills %}
+                {% for skill in skills %}
+                  <span class="skill">{{ skill }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="skill muted-skill">No skills extracted yet</span>
+              {% endif %}
+            </div>
+
+            <form class="quick-search" action="/search">
+              <input name="q" placeholder="Ask anything about your journey…" />
+              <button class="btn btn-primary btn-small" type="submit">Ask AI</button>
+            </form>
+          </article>
+
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Next on your timeline</h2>
+                <p class="card-sub">The story Veyra sees</p>
+              </div>
+              <a href="/timeline" class="kicker">Open ↗</a>
+            </div>
+
+            <div class="journey">
+              {% if timeline %}
+                {% for item in timeline %}
+                <div class="journey-item">
+                  <b>{{ item.title }}</b><span>{{ item.subtitle }} · {{ item.year }}</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="empty-state">
+                  <b>Timeline is empty</b>
+                  <span>Upload a few documents to build your story.</span>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/shared.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

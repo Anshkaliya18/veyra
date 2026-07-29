@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Veyra • Profile</title>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="9603f84b-8dbd-417b-9738-c52d25aa1d18"></script>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/profile.css" />
+  </head>
+  <body class="app-body">
+    <div class="grid-noise"></div>
+    <div class="app-layout">
+      <aside class="sidebar">
+        <a class="brand" href="/"><i class="brand-mark"></i><span class="brand-name">ve<span>y</span>ra</span></a>
+        <nav>
+          <div class="nav-group">
+            <p class="nav-label">Workspace</p>
+            <a class="side-link" href="/dashboard"><span class="side-icon">◈</span>Overview</a>
+            <a class="side-link" href="/upload"><span class="side-icon">↑</span>Upload</a>
+            <a class="side-link" href="/search"><span class="side-icon">⌕</span>AI Search</a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-label">Identity</p>
+            <a class="side-link" href="/timeline"><span class="side-icon">⌁</span>Timeline</a>
+            <a class="side-link active" href="/profile"><span class="side-icon">◉</span>Profile</a>
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="account-mini" href="/profile">
+            <span class="avatar">{{ (user.firstName or 'U')[:1] }}{{ (user.lastName or 'X')[:1] }}</span>
+            <div>
+              <b>{{ user.firstName }} {{ user.lastName }}</b>
+              <span>{{ user.email }}</span>
+            </div>
+          </a>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="app-topbar">
+          <span class="crumb">Identity / <b>Profile</b></span>
+          <div class="top-tools">
+            <a class="side-link" href="/settings"><span class="side-icon">⚙</span>Settings</a>
+            <button class="round-icon" type="button">↗</button>
+          </div>
+        </header>
+
+        <section class="profile-header app-card reveal">
+          <div class="profile-avatar">{{ (user.firstName or 'U')[:1] }}{{ (user.lastName or 'X')[:1] }}</div>
+          <div>
+            <h1>{{ user.firstName }} {{ user.lastName }} <span style="font-size:14px;color:#59dccb">●</span></h1>
+            <p>{{ profile.highlights[0] if profile.highlights else 'A growing AI identity workspace' }}</p>
+            <div class="profile-links">
+              <a href="#">{{ user.email }}</a>
+              <a href="#">Joined {{ profile.joined_label }}</a>
+              <a href="#">Workspace profile</a>
+            </div>
+          </div>
+          <a class="btn btn-primary btn-small" href="#">Share profile <span>↗</span></a>
+        </section>
+
+        <section class="stat-grid app-section">
+          <article class="app-card stat-card reveal" style="--glow: #806bff">
+            <div class="stat-value">{{ profile.stats.completeness }}<span style="font-size: 14px">%</span></div>
+            <div class="stat-label">Workspace completeness</div>
+            <div class="stat-trend">{{ profile.stats.completed }} completed</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #55ddcf">
+            <div class="stat-value">{{ profile.stats.skills }}</div>
+            <div class="stat-label">Verified skills</div>
+            <div class="stat-trend">{{ profile.stats.projects }} project{{ 's' if profile.stats.projects != 1 else '' }}</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ff83bd">
+            <div class="stat-value">{{ profile.stats.projects }}</div>
+            <div class="stat-label">Signature projects</div>
+            <div class="stat-trend">Workspace derived</div>
+          </article>
+          <article class="app-card stat-card reveal" style="--glow: #ffca7a">
+            <div class="stat-value">{{ profile.stats.credentials }}</div>
+            <div class="stat-label">Credentials</div>
+            <div class="stat-trend">{{ profile.stats.active }} active</div>
+          </article>
+        </section>
+
+        <section class="profile-grid app-section">
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Signature work</h2>
+                <p class="card-sub">Documents and projects currently shaping the profile</p>
+              </div>
+              <a class="kicker" href="/upload">View uploads</a>
+            </div>
+
+            {% if profile.recent_documents %}
+              {% for doc in profile.recent_documents %}
+              <div class="project">
+                <h3>{{ doc.name }}</h3>
+                <p>{{ doc.summary }}</p>
+                <span>{{ doc.kind|title }} · {{ doc.status|title }} · {{ doc.date }}</span>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="project">
+                <h3>No documents yet</h3>
+                <p>Upload your first file to populate the profile with real data.</p>
+                <span>Workspace empty</span>
+              </div>
+            {% endif %}
+          </article>
+
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Skills in focus</h2>
+                <p class="card-sub">Evidence-backed capabilities</p>
+              </div>
+            </div>
+            <div class="skill-cloud">
+              {% if profile.skills %}
+                {% for skill in profile.skills %}
+                  <span class="skill">{{ skill }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="skill">No skills extracted yet</span>
+              {% endif %}
+            </div>
+            <div class="profile-timeline journey">
+              {% if profile.highlights %}
+                {% for item in profile.highlights %}
+                <div class="journey-item">
+                  <b>{{ item }}</b>
+                  <span>Derived from uploaded documents</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="journey-item">
+                  <b>No highlights yet</b>
+                  <span>Upload files to generate profile signals.</span>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">Recognitions</h2>
+                <p class="card-sub">Derived from your uploaded files</p>
+              </div>
+            </div>
+            {% if profile.recent_documents %}
+              {% for doc in profile.recent_documents[:3] %}
+              <div class="achievement">
+                <span class="achievement-icon">✦</span>
+                <div>
+                  <b>{{ doc.name }}</b>
+                  <p>{{ doc.kind|title }} · {{ doc.date }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="achievement">
+                <span class="achievement-icon">✦</span>
+                <div>
+                  <b>No recognition yet</b>
+                  <p>Upload files to reveal the profile view.</p>
+                </div>
+              </div>
+            {% endif %}
+          </article>
+
+          <article class="app-card reveal">
+            <div class="card-row">
+              <div>
+                <h2 class="card-title">The current arc</h2>
+                <p class="card-sub">Your story in three moments</p>
+              </div>
+              <a class="kicker" href="/timeline">Timeline ↗</a>
+            </div>
+            <div class="journey">
+              {% if profile.highlights %}
+                {% for item in profile.highlights[:3] %}
+                <div class="journey-item">
+                  <b>{{ item }}</b><span>Real workspace signal</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="journey-item">
+                  <b>No journey yet</b><span>Upload files to build your story.</span>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="js/shared.js"></script>
+    <script src="js/profile.js"></script>
+  </body>
+</html>
